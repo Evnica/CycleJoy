@@ -1,0 +1,346 @@
+/*Reset: not all, only relevant to the code!*/
+
+html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, abbr, img, strong, u, i, center, dt, ul, li, fieldset, form, label,
+table, tbody, tfoot, thead, tr, th, td, article, aside, canvas, footer, header, menu, nav, section {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font: inherit;
+    vertical-align: baseline;
+}
+
+article, aside, details, footer, header, menu, nav, section {
+    display: block;
+}
+
+body {
+    line-height: 1;
+    background: #162e69;
+    height: 100%;
+    font-family: Helvetica, sans-serif;
+}
+
+ul {
+    list-style: none;
+}
+
+html {
+    height: 100%;
+}
+
+/*Text*/
+
+body, input, textarea, select {
+    font-weight: 400;
+    font-size: 18pt;
+    line-height: 1.75em;
+    color: #252c40;
+    letter-spacing: 0.025em;
+}
+
+    @media screen and (max-width: 1920px) {
+
+        body, input, textarea, select {
+            font-size: 17pt;
+        }
+    }
+
+    @media screen and (max-width: 1680px) {
+
+        body, input, textarea, select {
+            font-size: 15pt;
+        }
+    }
+
+    @media screen and (max-width: 1280px) {
+
+        body, input, textarea, select {
+            font-size: 13pt;
+        }
+    }
+
+    @media screen and (max-width: 1000px) {
+
+        body, input, textarea, select {
+            font-size: 13pt;
+        }
+    }
+
+    @media screen and (max-width: 800px) {
+
+        body, input, textarea, select {
+            font-size: 12pt;
+            line-height: 1.5em;
+        }
+    }
+
+    @media screen and (max-width: 300px) {
+
+        body, input, textarea, select {
+            font-size: 11pt;
+            line-height: 1.5em;
+        }
+    }
+
+h1, h2{
+    font-weight: 800;
+    color: #211d4b;
+}
+
+h2{
+    padding-bottom: 1em;
+}
+
+    .content p a{
+        color: #211d4b;
+    }
+
+/*Header*/
+#header {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.95);
+    height: 3em;
+    line-height: 3em;
+    box-shadow: 0 0 0.15em 0 rgba(0, 0, 0, 0.1);
+}
+
+#header h1 {
+    position: absolute;
+    top: 0;
+    height: 3em;
+    line-height: 3em;
+}
+
+#header nav {
+    position: absolute;
+    right: 0.5em;
+    top: 0;
+    height: 3em;
+    line-height: 3em;
+}
+
+#header nav ul {
+    margin: 0;
+}
+
+#header nav ul li {
+    display: inline-block;
+    margin-left: 0.5em;
+    font-size: 0.9em;
+}
+
+#header nav ul li a {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    height: 3em;
+    line-height: 3em;
+    padding: 0 0.5em 0 0.5em;
+    outline: 0;
+    cursor: pointer;
+}
+
+@media screen and (min-width: 801px) {
+    #header h1{
+        left: 1em;
+    }
+}
+
+@media screen and (max-width: 800px) {
+
+    #header {
+        height: 6.5em;
+        line-height: 2.5em;
+        left: 0;
+        padding-top: 0.5em;
+    }
+
+    #header h1 {
+        text-align: center;
+        position: relative;
+        top: 0;
+        height: 2.5em;
+        line-height: 2.5em;
+        font-size: 1.5em;
+    }
+
+    #header nav {
+        text-align: center;
+        position: relative;
+        height: 2.5em;
+        line-height: 2.5em;
+        font-size: 1em;
+    }
+}
+
+@media screen and (max-width: 320px) {
+
+    #header {
+        left: 0;
+        height: 8em;
+        line-height: 1.5em;
+        text-align: center;
+        position: relative;
+        padding: 1em 0 0 0;
+    }
+
+    #header h1 {
+        top: 0;
+        height: 1.5em;
+        line-height: 1.5em;
+        font-size: 1.5em;
+        margin-left: -0.5em;
+    }
+
+    #header nav {
+        height: 1.5em;
+        line-height: 1.5em;
+        font-size: 1em;
+    }
+
+    #header nav ul li{
+        display: block;
+    }
+
+    #header nav ul li a {
+        height: 1.5em;
+        line-height: 1.5em;
+        padding: 0.5em 0.5em 0 0.5em;
+        outline: 0;
+    }
+}
+
+/*Wrapper for content*/
+
+.wrapper{
+    padding: 5.5em 4% 4% 4%;
+    margin: auto;
+}
+
+    @media screen and (max-width: 800px) {
+        .wrapper{
+            padding-top: 9em;
+        }
+    }
+
+    @media screen and (max-width: 320px) {
+        .wrapper{
+            padding-top: 3em;
+        }
+    }
+
+
+.content {
+    position: relative;
+    z-index: 1;
+    background: #ffffff;
+    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
+    max-width: 72%;
+    margin: 0 auto 50px;
+    padding: 80px;
+    text-align: center;
+}
+
+@media screen and (max-width: 1680px) {
+    .content{
+        max-width: 76%;
+    }
+}
+
+@media screen and (max-width: 1280px) {
+    .content{
+        max-width: 82%;
+        padding: 60px;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    .content{
+        max-width: 86%;
+        padding: 40px;
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .content{
+        max-width: 92%;
+        padding: 20px;
+    }
+}
+
+@media screen and (max-width: 300px) {
+    .content{
+        max-width: 96%;
+        padding: 10px;
+    }
+}
+
+/*Buttons*/
+input[type="button"] {
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    -moz-transition: background-color 0.2s ease-in-out;
+    -webkit-transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out;
+    background-color: #162e69;
+    border: 0;
+    border-radius: 0.5em;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-block;
+    height: 1.5em;
+    line-height: 1.5em;
+    outline: 0;
+    margin-top: 2em;
+    padding: 0 1em 0 1em;
+    position: relative;
+    text-align: center;
+    text-decoration: none;
+}
+    @media screen and (max-width: 800px) {
+        input[type="button"]{
+            margin-top: 1.2em;
+        }
+    }
+
+    @media screen and (max-width: 300px) {
+        input[type="button"]{
+            margin-top: 0.8em;
+        }
+    }
+
+/*Footer*/
+
+footer{
+    position: relative;
+    height: 2.5em;
+    line-height: 2.5em;
+    margin: 0;
+    background: #180a51;
+    color: rgba(185, 186, 187, 0.5);
+    overflow: hidden;
+}
+
+    footer ul.menu {
+        position: absolute;
+        right: 0.5em;
+        top: 0;
+        height: 2.5em;
+        line-height: 2.5em;
+        margin: 0;
+    }
+
+    footer ul.menu li {
+        display: inline-block;
+        padding-left: 1em;
+        border-left-color: rgba(185, 186, 187, 0.2);
+        font-size: 0.9em;
+    }
+
+    footer ul.menu li a{
+        color: white;
+    }

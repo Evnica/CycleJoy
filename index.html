@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CycleJoy: Welcome!</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="shortcut icon" href="favicon.ico" />
+    <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header id="header">
+
+    <h1>CycleJoy</h1>
+    <nav>
+        <ul>
+            <li onclick="scrollToElement('nightTrip')"><a>Night Trip</a></li>
+            <li onclick="scrollToElement('kidsTrip')"><a>Kids Trip</a></li>
+            <li onclick="scrollToElement('historicalTrip')"><a>Historical Trip</a></li>
+            <!--<li><img class="logo" src="assets/img/logo.png" alt="DevTeam"></li>-->
+        </ul>
+    </nav>
+
+</header>
+
+<div class="wrapper">
+
+    <div class="content">
+       <h1>WELCOME to CycleJoy</h1>
+    </div>
+
+    <div class="content" id="about">
+        <h2><strong>Short Introduction</strong></h2>
+        <p class="txt">
+            <strong>CycleJoy</strong> dolor sit amet, consectetur adipiscing elit. Sed commodo elit eget metus
+            mattis, vel ultrices neque imperdiet. Class aptent taciti sociosqu ad litora torquent per conubia
+            nostra, per inceptos himenaeos. Duis sit amet aliquet purus, eget malesuada elit. Aenean mauris orci,
+            accumsan id enim et, dictum interdum nunc. Nullam in malesuada velit, a luctus lorem. Integer eu
+            convallis ligula. Pellentesque iaculis in odio a semper.</p>
+
+        <p>
+            Praesent arcu est, bibendum quis odio sit amet, convallis egestas elit. Vivamus vitae facilisis massa,
+            eu ultricies dolor. Integer id volutpat orci. Sed a pellentesque ante, nec posuere arcu. In hac
+            habitasse platea dictumst. Praesent efficitur massa eu felis bibendum, vel consectetur lacus tristique.
+            Donec pretium justo non odio tristique tincidunt. Sed vitae nulla malesuada, dictum tortor nec,
+            elementum ipsum. Nunc imperdiet quis odio at tempus. Phasellus lacinia auctor enim non ullamcorper.
+            Nunc aliquam non velit in consequat. Duis a libero id eros euismod commodo. Aliquam sed porttitor nunc.
+            Sed convallis mauris volutpat egestas bibendum.
+        </p>
+
+        <p>
+            To find out more about the project click <a href="about.html">here</a>.
+        </p>
+
+    </div>
+
+    <div class="content" id="nightTrip">
+        <h2><strong>Night Trip</strong></h2>
+        <p class="txt">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec dapibus sem non malesuada imperdiet. In
+            sem sem, suscipit eget malesuada eu, placerat eu massa. Integer id varius quam. Praesent sodales metus
+            vitae eros iaculis, vel laoreet augue finibus. Aliquam consequat, dui id dapibus ornare, leo risus
+            dignissim erat, nec pellentesque nibh augue vel nunc. Pellentesque consectetur massa lorem. Quisque
+            consectetur cursus velit. Morbi non sem sed justo ornare euismod at quis arcu. Proin bibendum in
+            tortor in aliquet. Aliquam varius lorem at accumsan condimentum. Vivamus placerat, lorem nec suscipit
+            faucibus, metus odio finibus libero, molestie laoreet tellus ex sit amet justo. In fermentum molestie
+            enim quis feugiat. Quisque laoreet, sapien sit amet malesuada fringilla, magna dui malesuada eros, non
+            efficitur ipsum massa in lectus.</p>
+
+        <p>
+            Nulla tempor gravida erat, auctor imperdiet tellus fringilla in. Etiam malesuada arcu vel ipsum tempor,
+            vel varius mauris vulputate. Mauris dictum lobortis enim et varius. Vestibulum efficitur scelerisque ex
+            ac lobortis. Sed id fermentum libero. Etiam ornare ac neque at efficitur. Pellentesque et ullamcorper
+            ex, ac congue libero.
+        </p>
+        <input type="button" id="goNight" value="Explore the Night!" onclick="goNight()">
+    </div>
+
+    <div class="content" id="kidsTrip">
+        <h2><strong>Kids Trip</strong></h2>
+        <p class="txt">
+            Pellentesque nisi ipsum, porttitor rutrum sapien a, pharetra vulputate ex. Vestibulum dapibus
+            sollicitudin est iaculis auctor. Vestibulum volutpat condimentum mauris a euismod. Curabitur pretium
+            lectus ut leo varius, a euismod mi elementum. Phasellus cursus, arcu eget volutpat fermentum, orci
+            sapien finibus augue, id ullamcorper massa orci sed ante. Aliquam erat volutpat. Praesent a gravida
+            nulla.</p>
+
+        <p>
+            Praesent arcu est, bibendum quis odio sit amet, convallis egestas elit. Vivamus vitae facilisis massa,
+            eu ultricies dolor. Integer id volutpat orci. Sed a pellentesque ante, nec posuere arcu. In hac
+            habitasse platea dictumst. Praesent efficitur massa eu felis bibendum, vel consectetur lacus tristique.
+            Donec pretium justo non odio tristique tincidunt. Sed vitae nulla malesuada, dictum tortor nec,
+            elementum ipsum. Nunc imperdiet quis odio at tempus. Phasellus lacinia auctor enim non ullamcorper.
+            Nunc aliquam non velit in consequat. Duis a libero id eros euismod commodo. Aliquam sed porttitor nunc.
+            Sed convallis mauris volutpat egestas bibendum.
+        </p>
+        <input type="button" id="goKids" value="Join Kids Adventure!" onclick="goKids()">
+    </div>
+
+    <div class="content" id="historicalTrip">
+        <h2><strong>Historical Trip</strong></h2>
+        <p class="txt">
+            Integer nec congue magna. Nullam aliquet nisl orci, sit amet dapibus nisl rhoncus sit amet. Lorem ipsum
+            dolor sit amet, consectetur adipiscing elit. Nulla tempor gravida erat, auctor imperdiet tellus
+            fringilla in. Etiam malesuada arcu vel ipsum tempor, vel varius mauris vulputate. Mauris dictum
+            lobortis enim et varius. Vestibulum efficitur scelerisque ex ac lobortis. Sed id fermentum libero.
+            Etiam ornare ac neque at efficitur. Pellentesque et ullamcorper ex, ac congue libero.</p>
+
+        <p>
+            Quisque fermentum consequat tellus in commodo. Suspendisse sed lectus dictum, suscipit magna quis,
+            convallis sapien. Ut in velit ut nibh tristique viverra. Mauris molestie elit vitae ligula tempus
+            pellentesque. Mauris congue fringilla odio, sed dignissim odio sollicitudin in. Cras consequat tempus
+            enim in lacinia. Suspendisse ac viverra lacus, auctor tempor lacus. Vestibulum commodo lacus eget
+            posuere laoreet. Mauris est lectus, accumsan nec nibh a, sagittis facilisis eros. Sed feugiat vel odio
+            eu dictum. Nunc nec mi nulla. Nulla congue vehicula risus, eget semper mauris malesuada vitae.
+            Vestibulum at metus semper, accumsan nibh non, vulputate elit. Fusce mi leo, vestibulum a interdum a,
+            semper quis felis.
+        </p>
+        <input type="button" id="goHistorical" value="Travel Back in Time!" onclick="goHistorical()">
+    </div>
+</div>
+
+<footer>
+    <ul class="menu">
+        <li id="home"><a href="#">Top</a></li>
+        <li><a href="about.html">About</a></li>
+        <li id="cuas"><a href="http://www.fh-kaernten.at/" target="_blank">CUAS</a></li>
+    </ul>
+
+</footer>
+
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/main.js"></script>
+
+</body>
+</html>
