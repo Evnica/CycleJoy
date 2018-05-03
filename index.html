@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>CycleJoy: Welcome!</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://api.tiles.mapbox.com/mapbox-gl-js/v0.31.0/mapbox-gl.js"></script>
     <link rel="shortcut icon" href="favicon.ico" />
     <link rel="stylesheet" href="assets/css/main.css">
 </head>
@@ -72,7 +73,7 @@
             ac lobortis. Sed id fermentum libero. Etiam ornare ac neque at efficitur. Pellentesque et ullamcorper
             ex, ac congue libero.
         </p>
-        <input type="button" id="goNight" value="Explore the Night!" onclick="goNight()">
+        <input type="button" id="goNight" value="Explore the Night!" onclick="go('night')">
     </div>
 
     <div class="content" id="kidsTrip">
@@ -93,7 +94,7 @@
             Nunc aliquam non velit in consequat. Duis a libero id eros euismod commodo. Aliquam sed porttitor nunc.
             Sed convallis mauris volutpat egestas bibendum.
         </p>
-        <input type="button" id="goKids" value="Join Kids Adventure!" onclick="goKids()">
+        <input type="button" id="goKids" value="Join Kids Adventure!" onclick="go('kids')">
     </div>
 
     <div class="content" id="historicalTrip">
@@ -115,7 +116,7 @@
             Vestibulum at metus semper, accumsan nibh non, vulputate elit. Fusce mi leo, vestibulum a interdum a,
             semper quis felis.
         </p>
-        <input type="button" id="goHistorical" value="Travel Back in Time!" onclick="goHistorical()">
+        <input type="button" id="goHistorical" value="Travel Back in Time!" onclick="go('historical')">
     </div>
 </div>
 
