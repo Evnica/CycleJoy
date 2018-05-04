@@ -1,0 +1,166 @@
+[
+{
+"place_id": "20619121",
+"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+"osm_type": "node",
+"osm_id": "1968709928",
+"boundingbox": [
+"48.2099704",
+"48.2100704",
+"16.3679718",
+"16.3680718"
+],
+"lat": "48.2100204",
+"lon": "16.3680218",
+"display_name": "Night Dive, 8, Naglergasse, Widmerviertel, KG Innere Stadt, Innere Stadt, Vienna, 1010, Austria",
+"class": "amenity",
+"type": "restaurant",
+"importance": 0.21025,
+"icon": "https://nominatim.openstreetmap.org/images/mapicons/food_restaurant.p.20.png"
+},
+{
+"place_id": "8928163",
+"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+"osm_type": "node",
+"osm_id": "902496922",
+"boundingbox": [
+"48.204795",
+"48.204895",
+"16.3759217",
+"16.3760217"
+],
+"lat": "48.204845",
+"lon": "16.3759717",
+"display_name": "Night Club Eve, 3, Schellinggasse, Stubenviertel, KG Innere Stadt, Innere Stadt, Vienna, 1010, Austria",
+"class": "amenity",
+"type": "stripclub",
+"importance": 0.21025
+},
+{
+"place_id": "26372499",
+"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+"osm_type": "node",
+"osm_id": "2484859207",
+"boundingbox": [
+"48.2350001",
+"48.2351001",
+"16.3657645",
+"16.3658645"
+],
+"lat": "48.2350501",
+"lon": "16.3658145",
+"display_name": "Leika's Night, Klosterneuburger Straße, KG Brigittenau, Brigittenau, Vienna, 1200, Austria",
+"class": "amenity",
+"type": "cafe",
+"importance": 0.21025,
+"icon": "https://nominatim.openstreetmap.org/images/mapicons/food_cafe.p.20.png"
+},
+{
+"place_id": "217934356",
+"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+"osm_type": "node",
+"osm_id": "5167578452",
+"boundingbox": [
+"48.2225555",
+"48.2226555",
+"16.3453778",
+"16.3454778"
+],
+"lat": "48.2226055",
+"lon": "16.3454278",
+"display_name": "Night Dream, 53, Währinger Gürtel, Währinger Cottage, KG Währing, Währing, Vienna, 1180, Austria",
+"class": "amenity",
+"type": "nightclub",
+"importance": 0.21025
+},
+{
+"place_id": "63044755",
+"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+"osm_type": "node",
+"osm_id": "5026447762",
+"boundingbox": [
+"48.1882558",
+"48.1883558",
+"16.3535212",
+"16.3536212"
+],
+"lat": "48.1883058",
+"lon": "16.3535712",
+"display_name": "Arena Night Club, 117, Margaretenstraße, Nikolsdorf, KG Margarethen, Margareten, Vienna, 1050, Austria",
+"class": "amenity",
+"type": "nightclub",
+"importance": 0.21025
+},
+{
+"place_id": "217788485",
+"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+"osm_type": "node",
+"osm_id": "5163059988",
+"boundingbox": [
+"48.2181328",
+"48.2182328",
+"16.343041",
+"16.343141"
+],
+"lat": "48.2181828",
+"lon": "16.343091",
+"display_name": "Vienna Night Club, 12, Währinger Gürtel, Thurygrund II, KG Alsergrund, Alsergrund, Vienna, 1090, Austria",
+"class": "amenity",
+"type": "bar;brothel",
+"importance": 0.21025
+},
+{
+"place_id": "217934355",
+"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+"osm_type": "node",
+"osm_id": "5167578451",
+"boundingbox": [
+"48.2225434",
+"48.2226434",
+"16.3452506",
+"16.3453506"
+],
+"lat": "48.2225934",
+"lon": "16.3453006",
+"display_name": "Cornea Lobas Studio-Bar, 53, Währinger Gürtel, Währinger Cottage, KG Währing, Währing, Vienna, 1180, Austria",
+"class": "amenity",
+"type": "brothel",
+"importance": 0.11025
+},
+{
+"place_id": "32410935",
+"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+"osm_type": "node",
+"osm_id": "2780106336",
+"boundingbox": [
+"45.8271382",
+"45.8272382",
+"1.2636567",
+"1.2637567"
+],
+"lat": "45.8271882",
+"lon": "1.2637067",
+"display_name": "Night Fever, 2, Rue Orpheroux, La Cité, Ventadour, Лимож, Верхняя Вьенна, New Aquitaine, Metropolitan France, 87000, France",
+"class": "amenity",
+"type": "nightclub",
+"importance": 0.10025
+},
+{
+"place_id": "32277934",
+"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
+"osm_type": "node",
+"osm_id": "2764079532",
+"boundingbox": [
+"45.829942",
+"45.830042",
+"1.2644307",
+"1.2645307"
+],
+"lat": "45.829992",
+"lon": "1.2644807",
+"display_name": "Le Lady's Night, Boulevard de la Cité, La Cité, Carnot-Marceau, Лимож, Верхняя Вьенна, New Aquitaine, Metropolitan France, 87000, France",
+"class": "amenity",
+"type": "nightclub",
+"importance": 0.10025
+}
+]
