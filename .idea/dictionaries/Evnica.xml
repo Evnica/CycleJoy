@@ -2,6 +2,7 @@
   <dictionary name="Evnica">
     <words>
       <w>geojson</w>
+      <w>geolocate</w>
       <w>geolocation</w>
       <w>onload</w>
     </words>
