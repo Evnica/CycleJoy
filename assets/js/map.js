@@ -12,6 +12,8 @@ const geoSettings = {
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZXZuaWNhIiwiYSI6ImNqZWxkM3UydTFrNzcycW1ldzZlMGppazUifQ.0p6IptRwe8QjDHuDp9SNjQ";
 
+checkGeolocationPermit();
+
 let map = new mapboxgl.Map({
     container: "map",
     style: "mapbox://styles/mapbox/satellite-streets-v10",
@@ -23,6 +25,18 @@ map.addControl(new mapboxgl.ScaleControl());
 
 const nav = new mapboxgl.NavigationControl( {options: { showZoom : false }} );
 map.addControl(nav, 'top-left');
+
+let geolocateControl = new mapboxgl.GeolocateControl({
+    positionOptions: geoSettings,
+    trackUserLocation: true,
+    showUserLocation: true
+});
+map.addControl(geolocateControl, 'top-left');
+
+const url = new URL(window.location.href);
+const parameters = {
+    tripType: url.searchParams.get('tripType')
+};
 
 let geolocationError = function(error){
     /*
@@ -37,6 +51,8 @@ let geolocationError = function(error){
     console.warn(`ERROR(${error.code}): ${error.message}`);
     inform("Your location could not be obtained. The app has switched to the basic functionality.");
     mode = 'basic';
+
+    requestPOIsFromServer();
 };
 
 let geolocationGranted = function(position) {
@@ -62,31 +78,9 @@ let geolocationGranted = function(position) {
     if (userLocation.coords.accuracy < 100){
         navigationEnabled = true;
     }
+
+    requestPOIsFromServer();
 };
-
-map.on('load', function(){
-    checkGeolocationPermit();
-
-    let geolocateControl = new mapboxgl.GeolocateControl({
-        positionOptions: geoSettings,
-        trackUserLocation: true,
-        showUserLocation: true
-    });
-    map.addControl(geolocateControl, 'top-left');
-
-    const url = new URL(window.location.href);
-    const parameters = {
-        tripType: url.searchParams.get('tripType')
-    };
-    $.get("CycleJoyIO", $.param(parameters), function (response) {
-        currentPOIs = response;
-        /*currentPOIs.features.forEach(function(marker){
-            let f1 = document.createElement('div');
-            f1.className = 'marker';
-            new mapboxgl.Marker(f1).setLngLat(marker.geometry.coordinates).addTo(map);
-        });*/
-    });
-});
 
 function checkGeolocationPermit() {
     if (navigator.geolocation){
@@ -109,6 +103,7 @@ function getLocationIfAvailable(state){
         inform("Your location data is not available. Bike your Brain switched to basic functions.");
         mode = 'basic';
         navigationEnabled = false;
+        requestPOIsFromServer();
     }
     else{
         if(state === 'prompt'){
@@ -126,7 +121,68 @@ function askYesNo(message){
 
 }
 
-function loadClosestPOI() {
-    alert("load closest POI");
+function loadPOIs(pois) {
+        if(mode === 'advanced'){
+            let min = Infinity;
+            let index = 0;
+            let indexOfMin;
+            let from = [userLocation.coords.longitude, userLocation.coords.latitude];
+            let targets = []; //{id, coords}
+            pois.features.forEach(function (feature) {
+                targets.push({ id : index, coords : feature.geometry.coordinates });
+                index++;
+            });
+            index = 0;
+            let to;
+            let directionsRequest;
+            pois.features.forEach(function(feature){
+                to = feature.geometry.coordinates;
+                directionsRequest = 'https://api.mapbox.com/directions/v5/mapbox/cycling/' + from[0] + ',' +
+                    from[1] + ';' + to[0] + ',' + to[1] + '?geometries=geojson&access_token=' +
+                    mapboxgl.accessToken;
+                $.ajax({
+                    method: 'GET',
+                    url: directionsRequest
+                }).done(function(data){
+                    console.log(data.waypoints[1].location);
+                    console.log(data.routes[0].distance);
+                    if (data.routes[0].distance < min){
+                        indexOfMin = index;
+                        min = data.routes[0].distance;
+                    }
+                    index++;
+                    if (index === pois.features.length)
+                    {
+                        console.log(min);
+                        addMarker(data.waypoints[1].location);
+                    }
+                });
+            })
+        }
+        else
+        {
+            pois.features.forEach(function(marker){
+                addMarker(marker.geometry.coordinates);
+            });
+        }
+
+}
+
+function addMarker(coordinates){
+    let f1 = document.createElement('div');
+    f1.className = 'marker';
+    new mapboxgl.Marker(f1).setLngLat(coordinates).addTo(map);
+}
+
+function requestPOIsFromServer() {
+    $.get("CycleJoyIO", $.param(parameters), function (response) {
+        currentPOIs = response;
+        loadPOIs(response);
+        /*currentPOIs.features.forEach(function(marker){
+            let f1 = document.createElement('div');
+            f1.className = 'marker';
+            new mapboxgl.Marker(f1).setLngLat(marker.geometry.coordinates).addTo(map);
+        });*/
+    });
 
 }
