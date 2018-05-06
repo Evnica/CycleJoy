@@ -344,3 +344,19 @@ footer{
     footer ul.menu li a{
         color: white;
     }
+
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+}
+
+.marker {
+    background-image: url('../img/mapbox-icon.png');
+    background-size: cover;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+}
