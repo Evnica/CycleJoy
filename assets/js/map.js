@@ -1,29 +1,75 @@
-let currentPOIs; // string
-let mode; // 'advanced', 'basic'
+let currentPOIs; // string representation of built-in POIs
+let userAddedLocations; // string representation of user added locations
+let mode; // 'advanced' - if location access is available, 'basic'
 let navigationEnabled = false; // true if location access granted and accuracy < 100 m
-let userLocation;
-let geoPermissionState;
+let userLocation; // position returned by navigator
+let geoPermissionState; // granted, denied or prompt
 
+// position retrieval settings
 const geoSettings = {
-    enableHighAccuracy: false,
-    maximumAge        : 60000,
-    timeout           : 20000
+    enableHighAccuracy: false, // no real navigation is provided, a hight accuracy (~1m) position is not needed
+    maximumAge        : 60000, // position no older than 1 minute since cyclists can move pretty fast
+    timeout           : 30000  // give some time to users with slower reaction to think about the prompt
 };
 
+// depending on the requested trip type, different POIs are loaded and different background maps are applied
+const url = new URL(window.location.href);
+const parameters = {
+    tripType: url.searchParams.get('tripType')
+};
+
+const styles = ["mapbox://styles/mapbox/satellite-streets-v10", //satellite imagery with labels
+                "mapbox://styles/mapbox/dark-v9", // black background
+                "mapbox://styles/mapbox/navigation-preview-day-v2", // traffic
+                "mapbox://styles/mapbox/streets-v10" // standard map
+];
+
+// select map style depending on the chosen trip type
+let currentStyle;
+switch (parameters.tripType){
+    case 'night':
+        currentStyle = styles[1];
+        break;
+    case 'kids':
+        currentStyle = styles[3];
+        break;
+    case 'culture':
+        currentStyle = styles[0];
+        break;
+    default:
+        currentStyle = styles[2];
+}
+
+// access token has to be restricted to a certain domain in a real world app
 mapboxgl.accessToken = "pk.eyJ1IjoiZXZuaWNhIiwiYSI6ImNqZWxkM3UydTFrNzcycW1ldzZlMGppazUifQ.0p6IptRwe8QjDHuDp9SNjQ";
 
+/*
+* If geolocation available in the browser, the state of geolocation permission is queried
+* See getLocationIfAvailable(state) for further info
+* */
 checkGeolocationPermit();
 
+
+
+/*
+* The app targets cyclists in Vienna, and therefore limits the map extent to Vienna region
+* */
+const bounds = [[16.130798, 48.090050], [16.620376, 48.331649]];
+
+/*
+* The default map style is satellite
+* */
 let map = new mapboxgl.Map({
     container: "map",
-    style: "mapbox://styles/mapbox/satellite-streets-v10",
+    style: currentStyle,
     center: [16.35, 48.2],
-    zoom: 13
+    zoom: 13,
+    maxBounds: bounds
 });
 
 map.addControl(new mapboxgl.ScaleControl());
 
-const nav = new mapboxgl.NavigationControl( {options: { showZoom : false }} );
+const nav = new mapboxgl.NavigationControl({ showZoom: false });
 map.addControl(nav, 'top-left');
 
 let geolocateControl = new mapboxgl.GeolocateControl({
@@ -33,10 +79,7 @@ let geolocateControl = new mapboxgl.GeolocateControl({
 });
 map.addControl(geolocateControl, 'top-left');
 
-const url = new URL(window.location.href);
-const parameters = {
-    tripType: url.searchParams.get('tripType')
-};
+
 
 let geolocationError = function(error){
     /*
@@ -52,7 +95,7 @@ let geolocationError = function(error){
     inform("Your location could not be obtained. The app has switched to the basic functionality.");
     mode = 'basic';
 
-    requestPOIsFromServer();
+    requestPOIifTypeChosen();
 };
 
 let geolocationGranted = function(position) {
@@ -79,8 +122,10 @@ let geolocationGranted = function(position) {
         navigationEnabled = true;
     }
 
-    requestPOIsFromServer();
+    requestPOIifTypeChosen();
 };
+
+
 
 function checkGeolocationPermit() {
     if (navigator.geolocation){
@@ -175,14 +220,22 @@ function addMarker(coordinates){
 }
 
 function requestPOIsFromServer() {
-    $.get("CycleJoyIO", $.param(parameters), function (response) {
-        currentPOIs = response;
-        loadPOIs(response);
-        /*currentPOIs.features.forEach(function(marker){
+        $.get("CycleJoyIO", $.param(parameters), function (response) {
+            currentPOIs = response;
+            loadPOIs(response);
+            /*currentPOIs.features.forEach(function(marker){
             let f1 = document.createElement('div');
             f1.className = 'marker';
             new mapboxgl.Marker(f1).setLngLat(marker.geometry.coordinates).addTo(map);
         });*/
-    });
+        });
+}
 
+function requestPOIifTypeChosen() {
+    if (parameters.tripType !== null) {
+        requestPOIsFromServer();
+    }
+    else{
+        inform("Trip type not chosen. No target locations can be displayed.")
+    }
 }
