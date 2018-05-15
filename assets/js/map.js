@@ -25,19 +25,19 @@ const styles = ["mapbox://styles/mapbox/satellite-streets-v10", //satellite imag
 ];
 
 // select map style depending on the chosen trip type
-let currentStyle;
+let currentStyleIndex;
 switch (parameters.tripType){
     case 'night':
-        currentStyle = styles[1];
+        currentStyleIndex = 1;
         break;
     case 'kids':
-        currentStyle = styles[3];
+        currentStyleIndex = 3;
         break;
     case 'culture':
-        currentStyle = styles[0];
+        currentStyleIndex = 0;
         break;
     default:
-        currentStyle = styles[2];
+        currentStyleIndex = 2;
 }
 
 // access token has to be restricted to a certain domain in a real world app
@@ -61,17 +61,55 @@ const bounds = [[16.130798, 48.090050], [16.620376, 48.331649]];
 * */
 let map = new mapboxgl.Map({
     container: "map",
-    style: currentStyle,
+    style: styles[currentStyleIndex],
     center: [16.35, 48.2],
     zoom: 13,
     maxBounds: bounds
 });
 
-map.addControl(new mapboxgl.ScaleControl());
+//---------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------ MAP CONTROLS -------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
+// map style
+// ES6 implementation of the background map style control
+class MapStyleControl {
+    onAdd(map) {
+        this._map = map;
+        this._container = document.createElement('div');
+        const button = document.createElement('button');
+        button.className = 'icon fa fa-map';
+        button.onclick = function () {
+            if (currentStyleIndex < 3){
+                currentStyleIndex++;
+            }
+            else {
+                currentStyleIndex = 0;
+            }
+            changeBackgroundStyle(currentStyleIndex);
+        };
+        this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
+        //this._container.textContent = 'Background';
+        this._container.appendChild(button);
+        return this._container;
+    }
 
+    onRemove() {
+        this._container.parentNode.removeChild(this._container);
+        this._map = undefined;
+    }
+}
+
+function changeBackgroundStyle(index){
+    map.setStyle(styles[index]);
+}
+
+map.addControl(new MapStyleControl(), 'top-left');
+// Scale
+map.addControl(new mapboxgl.ScaleControl());
+// Compass
 const nav = new mapboxgl.NavigationControl({ showZoom: false });
 map.addControl(nav, 'top-left');
-
+// geolocation
 let geolocateControl = new mapboxgl.GeolocateControl({
     positionOptions: geoSettings,
     trackUserLocation: true,
@@ -239,3 +277,4 @@ function requestPOIifTypeChosen() {
         inform("Trip type not chosen. No target locations can be displayed.")
     }
 }
+

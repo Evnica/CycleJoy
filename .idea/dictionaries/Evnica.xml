@@ -6,6 +6,7 @@
       <w>geolocate</w>
       <w>geolocation</w>
       <w>mapbox</w>
+      <w>mapboxgl</w>
       <w>onload</w>
     </words>
   </dictionary>
