@@ -4,6 +4,7 @@ let mode; // 'advanced' - if location access is available, 'basic'
 let navigationEnabled = false; // true if location access granted and accuracy < 100 m
 let userLocation; // position returned by navigator
 let geoPermissionState; // granted, denied or prompt
+let editor = false;
 
 // position retrieval settings
 const geoSettings = {
@@ -129,7 +130,39 @@ const draw = new MapboxDraw({ controls: {
                                 uncombine_features: false
                             }
 });
-map.addControl(draw, 'top-right');
+
+// ES6 implementation of the point draw control
+class PointDrawControl {
+    onAdd(map) {
+        this._map = map;
+        this._container = document.createElement('div');
+        const button = document.createElement('button');
+        button.className = 'icon fa fa-edit';
+        button.onclick = function () {
+            toggleEditor();
+        };
+        this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
+        this._container.appendChild(button);
+        return this._container;
+    }
+
+    onRemove() {
+        this._container.parentNode.removeChild(this._container);
+        this._map = undefined;
+    }
+}
+
+function toggleEditor() {
+    if(editor){
+        map.removeControl(draw);
+    }
+    else {
+        map.addControl(draw, 'top-right');
+    }
+    editor = !editor;
+}
+
+map.addControl(new PointDrawControl(), 'top-right');
 
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------- HANDLE POSITION REQUEST ----------------------------------------------------
