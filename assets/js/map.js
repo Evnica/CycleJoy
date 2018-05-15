@@ -98,17 +98,19 @@ class MapStyleControl {
         this._map = undefined;
     }
 }
-
+// toggle background style
 function changeBackgroundStyle(index){
     map.setStyle(styles[index]);
 }
-
 map.addControl(new MapStyleControl(), 'top-left');
+
 // Scale
 map.addControl(new mapboxgl.ScaleControl());
+
 // Compass
 const nav = new mapboxgl.NavigationControl({ showZoom: false });
 map.addControl(nav, 'top-left');
+
 // geolocation
 let geolocateControl = new mapboxgl.GeolocateControl({
     positionOptions: geoSettings,
@@ -117,8 +119,11 @@ let geolocateControl = new mapboxgl.GeolocateControl({
 });
 map.addControl(geolocateControl, 'top-left');
 
+//---------------------------------------------------------------------------------------------------------------------
+//---------------------------------------- HANDLE POSITION REQUEST ----------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 
-
+// position access denied, timeout or navigator error: switch to basic mode and load all POIs relevant to the trip type
 let geolocationError = function(error){
     /*
     *       error = {
@@ -136,6 +141,10 @@ let geolocationError = function(error){
     requestPOIifTypeChosen();
 };
 
+/*
+* position access granted: load position, switch to advanced mode and enable navigation for accuracy < 100 m
+* load only the closest POI
+*/
 let geolocationGranted = function(position) {
     /*
     *   position = {
@@ -163,8 +172,10 @@ let geolocationGranted = function(position) {
     requestPOIifTypeChosen();
 };
 
-
-
+/*
+* check a permit to access user's location, enable permission status change monitoring and trigger the
+ * getLocationIfAvailable(state) function
+*/
 function checkGeolocationPermit() {
     if (navigator.geolocation){
         navigator.permissions.query({name:'geolocation'})
@@ -180,6 +191,9 @@ function checkGeolocationPermit() {
     }
 }
 
+/*
+* try to get user location and request
+*/
 function getLocationIfAvailable(state){
 
     if(state === 'denied'){
@@ -196,14 +210,25 @@ function getLocationIfAvailable(state){
     }
 }
 
-function inform(message) {
-    alert(message)
+//---------------------------------------------------------------------------------------------------------------------
+//-----------------------------------  CREATION of MARKERS and POP-UPs ------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
+
+/* An auxiliary function to add markers to the map based on passed coordinates */
+function addMarker(coordinates){
+    let f1 = document.createElement('div');
+    f1.className = 'marker';
+    new mapboxgl.Marker(f1).setLngLat(coordinates).addTo(map);
 }
 
-function askYesNo(message){
+//---------------------------------------------------------------------------------------------------------------------
+//---------------------------------------- SERVER and API INTERACTION -------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
 
-}
-
+/*
+* Load the closest POI in advanced mode after calculating the route and distance to each of the pre-defined POIs.
+* In basic mode load all POIs.
+*/
 function loadPOIs(pois) {
         if(mode === 'advanced'){
             let min = Infinity;
@@ -248,15 +273,9 @@ function loadPOIs(pois) {
                 addMarker(marker.geometry.coordinates);
             });
         }
-
 }
 
-function addMarker(coordinates){
-    let f1 = document.createElement('div');
-    f1.className = 'marker';
-    new mapboxgl.Marker(f1).setLngLat(coordinates).addTo(map);
-}
-
+/* An auxiliary function to load JSON content from the server */
 function requestPOIsFromServer() {
         $.get("CycleJoyIO", $.param(parameters), function (response) {
             currentPOIs = response;
@@ -269,6 +288,7 @@ function requestPOIsFromServer() {
         });
 }
 
+/* Preventing request to the server if no trip type was chosen (user loaded the map.html directly) */
 function requestPOIifTypeChosen() {
     if (parameters.tripType !== null) {
         requestPOIsFromServer();
@@ -278,3 +298,10 @@ function requestPOIifTypeChosen() {
     }
 }
 
+//---------------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------- DIALOGS ---------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
+
+function inform(message) {
+    alert(message)
+}
