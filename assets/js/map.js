@@ -4,7 +4,7 @@ let mode; // 'advanced' - if location access is available, 'basic'
 let navigationEnabled = false; // true if location access granted and accuracy < 100 m
 let userLocation; // position returned by navigator
 let geoPermissionState; // granted, denied or prompt
-let editor = false;
+let editor = false; // if true, a tool to draw points gets displayed
 
 // position retrieval settings
 const geoSettings = {
