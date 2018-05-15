@@ -11,5 +11,6 @@
     <orderEntry type="library" name="mapbox-gl" level="application" />
     <orderEntry type="library" name="turf" level="application" />
     <orderEntry type="library" name="jquery" level="application" />
+    <orderEntry type="library" name="mapbox-gl-draw" level="application" />
   </component>
 </module>
