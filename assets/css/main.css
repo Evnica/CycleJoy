@@ -354,13 +354,25 @@ footer{
     width: 100%;
 }
 
+.el{
+    color: #ce231c;
+}
+
 .marker {
-    background-image: url('../img/mapbox-icon.png');
+
     background-size: cover;
     width: 30px;
     height: 30px;
     border-radius: 50%;
     cursor: pointer;
+}
+
+.marker.tripRelated{
+    background-image: url('../img/mapbox-icon.png');
+}
+
+.marker.userGenerated{
+    background-image: url('../img/mapbox-icon.png');
 }
 
 .icon {

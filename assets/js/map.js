@@ -5,6 +5,20 @@ let navigationEnabled = false; // true if location access granted and accuracy <
 let userLocation; // position returned by navigator
 let geoPermissionState; // granted, denied or prompt
 let editor = false; // if true, a tool to draw points gets displayed
+let debug = true; // for development purposes only, to test features without interaction with the server
+const markerStyles = ['tripRelated', 'userGenerated'];
+let tripRelatedMarkers = [];
+var markerHeight = 50, markerRadius = 10, linearOffset = 25;
+var popupOffsets = {
+    'top': [0, 0],
+    'top-left': [0,0],
+    'top-right': [0,0],
+    'bottom': [0, -markerHeight],
+    'bottom-left': [linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
+    'bottom-right': [-linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
+    'left': [markerRadius, (markerHeight - markerRadius) * -1],
+    'right': [-markerRadius, (markerHeight - markerRadius) * -1]
+};
 
 // position retrieval settings
 const geoSettings = {
@@ -260,10 +274,45 @@ function getLocationIfAvailable(state){
 //---------------------------------------------------------------------------------------------------------------------
 
 /* An auxiliary function to add markers to the map based on passed coordinates */
+function createMarkerAndAdd(feature, addToMap){
+    //create container for a marker
+    let markerDiv = document.createElement('div');
+    markerDiv.className = 'marker tripRelated';
+    //create a pop-up
+    let popup = new mapboxgl.Popup( { offset : popupOffsets, anchor : 'bottom' } ).setHTML(feature.properties.description);
+    //create a marker, set its location and popup
+    let marker = new mapboxgl.Marker(markerDiv);
+    marker.setLngLat(feature.geometry.coordinates).setPopup(popup);
+
+    if (addToMap)
+    {
+        marker.addTo(map);
+        tripRelatedMarkers.push({
+            marker: marker,
+            addedToMap: true
+        })
+    }
+    else{
+        tripRelatedMarkers.push({
+            marker: marker,
+            addedToMap: false
+        })
+    }
+}
+
+function addMarker2(coordinates){
+    for (let i = 0; i < tripRelatedMarkers.length; i++){
+        if(tripRelatedMarkers[i].getLngLat() === coordinates){
+            tripRelatedMarkers[i].addTo(map);
+            break;
+        }
+    }
+}
+
 function addMarker(coordinates){
-    let f1 = document.createElement('div');
-    f1.className = 'marker';
-    new mapboxgl.Marker(f1).setLngLat(coordinates).addTo(map);
+    let marker = document.createElement('div');
+    marker.className = 'marker';
+    new mapboxgl.Marker(marker).setLngLat(coordinates).addTo(map);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -282,6 +331,7 @@ function loadPOIs(pois) {
             let from = [userLocation.coords.longitude, userLocation.coords.latitude];
             let targets = []; //{id, coords}
             pois.features.forEach(function (feature) {
+                createMarkerAndAdd(feature, false);
                 targets.push({ id : index, coords : feature.geometry.coordinates });
                 index++;
             });
@@ -307,15 +357,15 @@ function loadPOIs(pois) {
                     if (index === pois.features.length)
                     {
                         console.log(min);
-                        addMarker(data.waypoints[1].location);
+                        addMarker2(data.waypoints[1].location);
                     }
                 });
             })
         }
         else
         {
-            pois.features.forEach(function(marker){
-                addMarker(marker.geometry.coordinates);
+            pois.features.forEach(function(feature){
+                createMarkerAndAdd(feature, true);
             });
         }
 }
@@ -339,6 +389,15 @@ function requestPOIifTypeChosen() {
         requestPOIsFromServer();
     }
     else{
+        if(debug)
+        {
+            $.ajax({ url: 'data/culture.geojson', success: function (content) {
+                    currentPOIs = content;
+                    mode = 'basic';
+                    loadPOIs(content);
+                } })
+        }
+        else
         inform("Trip type not chosen. No target locations can be displayed.")
     }
 }
