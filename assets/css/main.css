@@ -1,3 +1,5 @@
+@import url("font-awesome.min.css");
+
 /*Reset: not all, only relevant to the code!*/
 
 html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, abbr, img, strong, u, i, center, dt, ul, li, fieldset, form, label,
@@ -352,11 +354,43 @@ footer{
     width: 100%;
 }
 
+.el{
+    color: #ce231c;
+}
+
 .marker {
-    background-image: url('../img/mapbox-icon.png');
+
     background-size: cover;
     width: 30px;
     height: 30px;
     border-radius: 50%;
     cursor: pointer;
+}
+
+.marker.tripRelated{
+    background-image: url('../img/mapbox-icon.png');
+}
+
+.marker.userGenerated{
+    background-image: url('../img/mapbox-icon.png');
+}
+
+.icon {
+    text-decoration: none;
+}
+
+.icon:before {
+    display: inline-block;
+    font-family: FontAwesome;
+    font-size: 1.25em;
+    text-decoration: none;
+    font-style: normal;
+    font-weight: normal;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.icon > .label {
+    display: none;
 }
