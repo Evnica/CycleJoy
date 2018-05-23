@@ -4,9 +4,9 @@
       "type": "Feature",
       "properties": {
         "id": 31,
-        "title": "Jazzland",
+        "Name": "Jazzland",
         "description": "Since 1972 Jazzland is the the oldest jazzclub in Austria. You can listen to all kinds of live jazz music with international and local musicians six times a week in a 500-years old cellar below the ancient Ruprechtskirche. In addition to many Austrian Jazz musicians, more than three hundred American stars have appeared in the Jazz cellar. Jazzland also offers a menu of solid Viennese cuisine with for example the traditional Wienerschnitzel and goulasch.",
-        "openingHours": "Opening hours:<br> Daily except Sunday: From 19:00 <br> Live music from 21:00",
+        "openingHours": "Daily except Sunday: From 19:00 <br> Live music from 21:00",
         "admissionFee": null,
         "quizQuestion": "Austria’s official language is...?",
         "quizAnswer": [
@@ -31,9 +31,9 @@
       "type": "Feature",
       "properties": {
         "id": 32,
-        "title": "DonauTechno",
+        "Name": "DonauTechno",
         "description": "DonauTechno is local night club with electronic music. The building, especially the ceiling of the club has a very original architecture. DonauTechno also offers a  light show, as the entire space is illuminated with a giant slide projection, which changes daily. The drinks are relatively cheap. Locals usual order weisser spritzer (white wine mixed with sparkling water) or a beer. Also, they have a famous Wurstelstand (a sandwich - sausage stand) inside the bar and offer delish hot dogs with the famous Viennese Käsekreiner! Great if you had a few drinks already.",
-        "openingHours": "Opening hours:<br> Daily from 20:00 - 4:00 am.",
+        "openingHours": "Daily from 20:00 - 4:00 am.",
         "admissionFee": null,
         "quizQuestion": "What does 'Wiener' mean?",
         "quizAnswer": [
@@ -58,9 +58,9 @@
       "type": "Feature",
       "properties": {
         "id": 33,
-        "title": "Onyx Bar",
+        "Name": "Onyx Bar",
         "description": "The ONYX bar is located on the 6th floor of the DO & CO Hotel, directly opposite of the St. Stephen's Cathedral. The generously sized glass facade offers a unique panorama with a direct view of St. Stephen's, which gleams in breathtaking light at night. A well-assorted selection of drinks, cocktails and cigars in a very cosy lounge atmosphere is the perfect place to relax. The bar views through floor-to-ceiling windows. Onyx bar is an exclusive bar in the middle of the city centre, the prices are quite expensive, but the view and atmosphere are worth it!",
-        "openingHours": "Opening hours:<br> Daily from: 11:00 am - 02:00 am.",
+        "openingHours": "Daily from: 11:00 am - 02:00 am.",
         "admissionFee": null,
         "quizQuestion": "What is Wiener Schnitzel?",
         "quizAnswer": [
@@ -85,9 +85,9 @@
       "type": "Feature",
       "properties": {
         "id": 34,
-        "title": "Chill Out - Lounge",
+        "Name": "Chill Out - Lounge",
         "description": "Vienna's Chill Out Lounge is characterized with its red-walled décor and comfy rattan chairs and sofas. The laid-back cocktail bar has a relaxing atmosphere, with enough cushions for a good night out to feel like a good night in.Every type of drink is available here, from whiskey and beer to something fruitier, and served from the afternoon until the early hours of the morning. There's an attractively priced Happy Hour daily between 6pm and 8pm during the week. Next to the lounge they also have a restaurant, where they serve international, traditional and vegan food.",
-        "openingHours": "Opening hours:<br> Mo-Sa: 17:00-02:00 am.<br> So: 18:00-00:30 am.",
+        "openingHours": "Mo-Sa: 17:00-02:00 am.<br> So: 18:00-00:30 am.",
         "admissionFee": null,
         "quizQuestion": "What’s the German word for Austria?",
         "quizAnswer": [
@@ -112,9 +112,9 @@
       "type": "Feature",
       "properties": {
         "id": 35,
-        "title": "Lemmon Bar",
+        "Name": "Lemmon Bar",
         "description": "Lemmon Bar is the only karaoke locale in the first district. It is a small bar which has a living room atmosphere. Wireless microphones and monitors throughout the bar make first-timers feel at ease, while seasoned performers can really get the crowd going. You can choose your desired song on request. Lemmon Bar is also famous for its exotic cocktail. Happy Hour is between 6:00 pm. and 9:00 pm. You can choose any cocktail for only 5 €. On thursday is also a special cocktail day.",
-        "openingHours": "Opening hours:<br> Tu-Th: 18:00-02:00 am.<br> Fr, Sa: 18:00-04:00am. <br> Closed: Mo, Su",
+        "openingHours": "Tu-Th: 18:00-02:00 am.<br> Fr, Sa: 18:00-04:00am. <br> Closed: Mo, Su",
         "admissionFee": null,
         "quizQuestion": "What is the famous Austrian white wine?",
         "quizAnswer": [
