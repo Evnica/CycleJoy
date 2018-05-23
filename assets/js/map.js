@@ -733,6 +733,7 @@ function requestPOIifTypeChosen() {
     if (parameters.tripType !== null) {
         requestPOIsFromServer();
     }
+    //for test purposes only! will not be there in the production version
     else{
         if(debug)
         {
@@ -749,23 +750,27 @@ function requestPOIifTypeChosen() {
                     });
                 } })
         }
-        else
-        inform("Trip type not chosen. No target locations can be displayed.")
+        else{
+            inform("Trip type not chosen. No target locations can be displayed.");
+            requestCommunityLocationsFromServer();
+        }
     }
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 //--------------------------------------------------- DIALOGS ---------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
-
+/*Inform user or prompt simple actions*/
 function inform(message) {
+    //TODO: style the information dialog; 2 separate versions: 1 for quiz, 1 for information only
     alert(message)
 }
 
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------  OTHER  ---------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
-
+/*Check whether a point is within a polygon (assessment of the user location; if not within Vienna region,
+* advanced mode can't be applied since tracking and routing are not applicable*/
 function pointInBounds(pointX, pointY, bounds) {
     //bounds = [[bottom left], [top right]]
     return pointX >= bounds[0][0] && pointX <= bounds[1][0] && pointY >= bounds[0][1] && pointY <= bounds[1][1];
