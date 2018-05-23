@@ -752,9 +752,9 @@ function requestPOIifTypeChosen() {
         }
         else{
             inform("Trip type not chosen. No target locations can be displayed.");
-            requestCommunityLocationsFromServer();
         }
     }
+    requestCommunityLocationsFromServer();
 }
 
 //---------------------------------------------------------------------------------------------------------------------
