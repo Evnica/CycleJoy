@@ -1,3 +1,24 @@
+/*
+* BIKE Your BRAIN (aka CycleJoy) is a web app for those who wants to exercise the mind together with the body.
+* Current version does not !yet! contain a quiz implementation
+* It focuses on the basic functionality such as displaying predefined and user generated locations with different popups
+* and allows to create new locations adding custom attributes
+* The app tracks the user location if allowed and if the user is located in Vienna (otherwise tracking makes no sense
+* and the app switches to basic mode).
+* In the advanced mode user gets information only about the closest location. When the user is nearby, he is offered a
+* quiz question an gets directions to the next location.
+* In the basic mode, all the locations of the trip are displayed on load, and quiz is not available.
+* Editor mode allows to add custom locations to the map. In the current version it has open access. When time allows,
+* the following version will require entering a secret code before editing.
+*
+* Date: 23.05.2018
+* Version: 0.12
+* Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
+*
+* All the efforts were made to reference the code that inspired creation of this file. Some of the snippets address
+* examples found on jquery and mapbox websites
+* */
+
 let currentPOIs; // string representation of built-in POIs
 let userAddedLocations; //  user added locations
 let mode; // 'advanced' - if location access is available, 'basic'
@@ -512,7 +533,7 @@ function ppNext(element) {
             const hint = $('#hint_' + id).text();
             const idx = $('#index_' + id).text();
 
-            //TODO: implement quiz
+            //TODO: implement quiz, including location check (only offer the quiz when user is near the POI)
 
             inform('here will be a quiz that is not yet implemented, asking\n ' + quizQuestion)
         }
@@ -573,6 +594,7 @@ function save(btn){
     }
 }
 
+/*Convert a set of properties into a json location object*/
 function createLocationObjectFromProperties(locationObjectProperties){
     return {
         "type": "Feature",
@@ -585,7 +607,7 @@ function createLocationObjectFromProperties(locationObjectProperties){
 }
 
 /* An auxiliary function to add markers to the map based on passed coordinates
-*  type can be userGenerated or tripRelated
+*  Type can be userGenerated or tripRelated
 * */
 function createMarkerAndAdd(feature, addToMap, type, hidden){
     //create container for a marker
@@ -700,10 +722,11 @@ function requestCommunityLocationsFromServer() {
     //TODO: implement reading a file with community locations from server
     $.get("CycleJoyIO", $.param({"tripType" : "user"}), function (response) {
         userAddedLocations = response;
-        loadPOIs(response);
+        response.features.forEach(function(feature){
+            createMarkerAndAdd(feature, true, 'userGenerated', 'hidden');
+        });
     });
 }
-
 
 /* Preventing request to the server if no trip type was chosen (user loaded the map.html directly) */
 function requestPOIifTypeChosen() {
