@@ -10,6 +10,8 @@
 * In the basic mode, all the locations of the trip are displayed on load, and quiz is not available.
 * Editor mode allows to add custom locations to the map. In the current version it has open access. When time allows,
 * the following version will require entering a secret code before editing.
+* NB: Server interaction is implemented with the help of Java Servlets. At this point only reading of server files is
+* supported. Writing to the file after user updates the list of locations will be supported in the version 0.13.
 *
 * Date: 23.05.2018
 * Version: 0.12
