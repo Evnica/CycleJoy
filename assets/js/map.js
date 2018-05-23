@@ -87,11 +87,10 @@ function setGrab(){
     }
 }
 
-//
+// add a marker when in editing mode with the draw feature activated
 map.on('click', function (evt) {
     if (drawActive){
         let lngLat = evt.lngLat;
-        //TODO: set marker, add to community locations
         let currentIds = [];
         userAddedLocations.features.forEach(function (feature) {
             currentIds.push(feature.properties.id.split('-')[1]);
@@ -539,24 +538,29 @@ function save(btn){
         locationObjectProperties[key] = value;
 
     });
-    let savedLocation = createLocationObjectFromProperties(locationObjectProperties);
-    let idxFound = -1;
 
-    for (let i = 0; i < userAddedLocations.features.length; i++){
-        if (userAddedLocations.features[i].properties.id === savedLocation.properties.id){
-            idxFound = i;
-            break;
+    if (locationObjectProperties.name !== '' && locationObjectProperties.description !== '') {
+        let savedLocation = createLocationObjectFromProperties(locationObjectProperties);
+        let idxFound = -1;
+
+        for (let i = 0; i < userAddedLocations.features.length; i++) {
+            if (userAddedLocations.features[i].properties.id === savedLocation.properties.id) {
+                idxFound = i;
+                break;
+            }
         }
+        if (idxFound !== -1) {
+            delete userAddedLocations.features[idxFound];
+        }
+        userAddedLocations.features[idxFound] = savedLocation;
+        console.log(JSON.stringify(userAddedLocations));
+        $('.mapboxgl-popup').each(function () {
+            $(this).remove();
+        });
     }
-    if(idxFound !== -1)
-    {
-        delete userAddedLocations.features[idxFound];
+    else{
+        inform('Name and description must be provided before saving a location');
     }
-    userAddedLocations.features[idxFound] = savedLocation;
-    console.log(JSON.stringify(userAddedLocations));
-    $('.mapboxgl-popup').each( function () {
-        $(this).remove();
-    } );
 }
 
 function createLocationObjectFromProperties(locationObjectProperties){
