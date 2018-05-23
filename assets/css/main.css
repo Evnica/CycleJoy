@@ -1,3 +1,13 @@
+/*
+* A stylesheet for the BIKE Your BRAIN (aka CycleJoy) app.
+*
+* Date: 23.05.2018
+* Version: 0.7
+* Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
+*
+* The style is inspired by https://html5up.net/ and http://geojson.io/
+* */
+
 @import url("font-awesome.min.css");
 
 /*Reset: not all, only relevant to the code!*/
