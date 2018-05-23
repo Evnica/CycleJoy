@@ -1,0 +1,60 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "um-1",
+        "name": "Kate's home",
+        "description": "Nice place to chat",
+        "lat": 48.198762928546266,
+        "lon": 16.34666919708252,
+        "tel.": "+436775463845"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.34666919708252,
+          48.198762928546266
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "um-2",
+        "name": "Max's home",
+        "description": "not too clean, but welcoming",
+        "lat": 48.19461501227339,
+        "lon": 16.347913742065426,
+        "hint": "cold beer is always available here"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.347913742065426,
+          48.19461501227339
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "um-3",
+        "name": "Luci's home",
+        "description": "a place for cat lovers",
+        "lat": 48.199077584352565,
+        "lon": 16.359844207763672,
+        "warning": "allergy warning! + cat hair in your tea",
+        "hint": "take your dog with you"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.359844207763672,
+          48.199077584352565
+        ]
+      }
+    }
+  ]
+}
