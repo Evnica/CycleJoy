@@ -488,6 +488,7 @@ function createCommunityLocationPopup(feature){
     return popup;
 }
 
+/*For trip related points, change popup content*/
 function ppNext(element) {
     let id = element.id.split('_')[1];
     let btnTxt = element.textContent;
@@ -496,32 +497,41 @@ function ppNext(element) {
         $("#ppOpnHrs_" + id).addClass('active');
         $("#ppAdmFee_" + id).addClass('active');
         $("#link_" + id).addClass('active');
-        $('#ppBtn_' + id).text('TO QUIZ');
+        if (mode === 'advanced') {
+            $('#ppBtn_' + id).text('TO QUIZ');
+        }
+        else{
+            $('#ppBtn_' + id).text('CLOSE');
+        }
     }
-    else if(btnTxt === 'TO QUIZ'){
+    else {
+        if(btnTxt === 'TO QUIZ'){
 
-        const quizQuestion = $('#quizQ_' + id).text();
-        const quizAnswer = $('#quizA_' + id).text();
-        const hint = $('#hint_' + id).text();
-        const idx = $('#index_' + id).text();
+            const quizQuestion = $('#quizQ_' + id).text();
+            const quizAnswer = $('#quizA_' + id).text();
+            const hint = $('#hint_' + id).text();
+            const idx = $('#index_' + id).text();
 
+            //TODO: implement quiz
+
+            inform('here will be a quiz that is not yet implemented, asking\n ' + quizQuestion)
+        }
+        $('#marker_' + id).addClass('visited');
         $('.mapboxgl-popup').each( function () {
             $(this).remove();
         } );
-
-        inform('here will be a quiz that is not yet implemented, asking\n ' + quizQuestion)
-
-        $('#marker_' + id).addClass('visited');
     }
 
 }
 
+/*Add a row to the user generated location popup for custom key-value pairs*/
 function addRow(btn){
     let id = $(btn).prop('id').split('_')[1];
     $('#tblCommLoc_' + id + ' tr:last')
         .after('<tr ><th><input type="text" value=""/></th><td><input type="text" value=""/></td></tr>' );
 }
 
+/*Save the content of the user generated location popup in case name and description are specified*/
 function save(btn){
     let key, value;
     let id = $(btn).prop('id').split('_')[1];
@@ -688,6 +698,10 @@ function requestPOIsFromServer() {
 /* An auxiliary function to load JSON community locations content from the server */
 function requestCommunityLocationsFromServer() {
     //TODO: implement reading a file with community locations from server
+    $.get("CycleJoyIO", $.param({"tripType" : "user"}), function (response) {
+        userAddedLocations = response;
+        loadPOIs(response);
+    });
 }
 
 
