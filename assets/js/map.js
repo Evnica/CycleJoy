@@ -6,19 +6,14 @@ let userLocation; // position returned by navigator
 let geoPermissionState; // granted, denied or prompt
 let editor = false; // if true, a tool to draw points gets displayed
 let debug = true; // for development purposes only, to test features without interaction with the server
-const markerStyles = ['tripRelated', 'userGenerated'];
 let tripRelatedMarkers = [];
-var markerHeight = 50, markerRadius = 10, linearOffset = 25;
-var popupOffsets = {
-    'top': [0, 0],
-    'top-left': [0,0],
-    'top-right': [0,0],
-    'bottom': [0, -markerHeight],
-    'bottom-left': [linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
-    'bottom-right': [-linearOffset, (markerHeight - markerRadius + linearOffset) * -1],
-    'left': [markerRadius, (markerHeight - markerRadius) * -1],
-    'right': [-markerRadius, (markerHeight - markerRadius) * -1]
-};
+let drawActive = false;
+let communityLocationsDisplayed = false;
+
+// browser detection, attribution: https://jsfiddle.net/311aLtkz/
+const isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+//const isFirefox = typeof InstallTrigger !== 'undefined';
+const isChrome = !!window.chrome && !!window.chrome.webstore;
 
 // position retrieval settings
 const geoSettings = {
@@ -82,17 +77,44 @@ let map = new mapboxgl.Map({
     maxBounds: bounds
 });
 
+let canvas = map.getCanvasContainer();
+
+/* Change the mouse cursor to 'grab' when the editing mode is off or point has been added*/
+function setGrab(){
+    drawActive = false;
+    if (isChrome || isOpera) {
+        canvas.style.cursor = '-webkit-grab';
+    } else {
+        canvas.style.cursor = 'grab';
+    }
+}
+
+//
+map.on('click', function (evt) {
+    if (drawActive){
+        let lngLat = evt.lngLat;
+        //TODO: set marker, add to community locations
+        setGrab();
+    }
+
+});
+
+// add tooltips to custom controls (editor mode, add point, show community locations)
+$( function() {
+    $( document ).tooltip();
+} );
+
 //---------------------------------------------------------------------------------------------------------------------
 //------------------------------------------------ MAP CONTROLS -------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
-// map style
-// ES6 implementation of the background map style control
+// map style control to toggle backgrounds
 class MapStyleControl {
     onAdd(map) {
         this._map = map;
         this._container = document.createElement('div');
         const button = document.createElement('button');
         button.className = 'icon fa fa-map';
+        button.title = 'Toggle background';
         button.onclick = function () {
             if (currentStyleIndex < 3){
                 currentStyleIndex++;
@@ -119,39 +141,73 @@ function changeBackgroundStyle(index){
 }
 map.addControl(new MapStyleControl(), 'top-left');
 
-// Scale
+// scale
 map.addControl(new mapboxgl.ScaleControl());
 
-// Compass
+// compass
 const nav = new mapboxgl.NavigationControl({ showZoom: false });
 map.addControl(nav, 'top-left');
 
-// geolocation
+/*
+ * geolocation control
+ * added to the map only if the user (1) allows to access his/her location and (2) is within the map bounds*/
 let geolocateControl = new mapboxgl.GeolocateControl({
     positionOptions: geoSettings,
     trackUserLocation: true,
     showUserLocation: true
 });
-map.addControl(geolocateControl, 'top-left');
 
-// draw
-const draw = new MapboxDraw({ controls: {
-                                point: true,
-                                line_string: false,
-                                polygon: false,
-                                trash: true,
-                                combine_features: false,
-                                uncombine_features: false
-                            }
-});
+/*
+* Control to toggle community locations (user generated points)
+* */
+class UserGeneratedMarkersControl {
+    onAdd(map) {
+        this._map = map;
+        this._container = document.createElement('div');
+        const button = document.createElement('button');
+        button.className = 'icon fa fa-users';
+        button.id = 'communityLocations';
+        button.title = 'Display community locations';
+        button.onclick = function () {
+            toggleCommunityLocations();
+        };
+        this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
+        this._container.appendChild(button);
+        return this._container;
+    }
 
-// ES6 implementation of the point draw control
-class PointDrawControl {
+    onRemove() {
+        this._container.parentNode.removeChild(this._container);
+        this._map = undefined;
+    }
+}
+
+/*
+* Turn the user generated locations on and off, changing the style of the control button
+* */
+function toggleCommunityLocations(){
+    if(communityLocationsDisplayed){
+        $('.userGenerated').addClass('hidden');
+        $('#communityLocations').removeClass('displayed').prop('title', 'Display community locations');
+    }
+    else{
+        $('.userGenerated').removeClass('hidden');
+        $('#communityLocations').addClass('displayed').prop('title', 'Hide community locations');
+    }
+    communityLocationsDisplayed = !communityLocationsDisplayed;
+}
+
+const communityLocationsControl = new UserGeneratedMarkersControl();
+map.addControl(communityLocationsControl, 'top-right');
+
+class EditingControl {
     onAdd(map) {
         this._map = map;
         this._container = document.createElement('div');
         const button = document.createElement('button');
         button.className = 'icon fa fa-edit';
+        button.title = 'Enter editor mode';
+        button.id = 'editor';
         button.onclick = function () {
             toggleEditor();
         };
@@ -166,17 +222,49 @@ class PointDrawControl {
     }
 }
 
+class PointDrawControl {
+    onAdd(map) {
+        this._map = map;
+        this._container = document.createElement('div');
+        const button = document.createElement('button');
+        button.className = 'icon fa fa-map-marker';
+        button.title = 'Add a location';
+        button.onclick = function () {
+            //TODO: implement adding a point
+            canvas.style.cursor = 'crosshair'; // who would guess that this is the way to change a cursor? css for map and body will do nothing!
+            drawActive = true;
+
+        };
+        this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
+        this._container.appendChild(button);
+        return this._container;
+    }
+
+    onRemove() {
+        this._container.parentNode.removeChild(this._container);
+        this._map = undefined;
+    }
+}
+
+const draw = new PointDrawControl();
+
 function toggleEditor() {
     if(editor){
         map.removeControl(draw);
+        $('#editor').removeClass('displayed').prop('title', 'Enter editor mode');
+        setGrab();
     }
     else {
         map.addControl(draw, 'top-right');
+        $('#editor').addClass('displayed').prop('title', 'Exit editor mode');
+        if (!communityLocationsDisplayed) {
+            $('#communityLocations').trigger('click');
+        }
     }
     editor = !editor;
 }
 
-map.addControl(new PointDrawControl(), 'top-right');
+map.addControl(new EditingControl(), 'top-right');
 
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------- HANDLE POSITION REQUEST ----------------------------------------------------
@@ -201,7 +289,7 @@ let geolocationError = function(error){
 };
 
 /*
-* position access granted: load position, switch to advanced mode and enable navigation for accuracy < 100 m
+* position access granted: load position, switch to advanced mode and enable navigation for accuracy < 250 m
 * load only the closest POI
 */
 let geolocationGranted = function(position) {
@@ -224,8 +312,16 @@ let geolocationGranted = function(position) {
     console.log(userLocation.coords.longitude);
     console.log(userLocation.coords.accuracy);
     mode = 'advanced';
-    if (userLocation.coords.accuracy < 100){
-        navigationEnabled = true;
+    if (pointInBounds(userLocation.coords.longitude, userLocation.coords.latitude, bounds)) {
+        map.addControl(geolocateControl, 'top-left');
+
+        if (userLocation.coords.accuracy < 250){
+            navigationEnabled = true;
+        }
+    }
+    else{
+        inform('You are located outside of the game area. The app switches to basic mode');
+        mode = 'basic';
     }
 
     requestPOIifTypeChosen();
@@ -273,30 +369,115 @@ function getLocationIfAvailable(state){
 //-----------------------------------  CREATION of MARKERS and POP-UPs ------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
 
-/* An auxiliary function to add markers to the map based on passed coordinates */
-function createMarkerAndAdd(feature, addToMap){
+function createPoiPopup(feature){
+
+    let popupStructure =
+        //    '<div id="ppImg{1}" class="hidden">{23}</div>\n' +
+        '    <div class="popupContent active">\n' +
+            '    <div id="name_{id}" class="active"><h2>{1}</h2></div>\n' +
+            '    <div id="ppDesc_{id}" class="longDescription active">{2}</div>\n' +
+            '    <div id="ppOpnHrs_{id}" class="hidden">{3}</div>\n' +
+            '    <div id="ppAdmFee_{id}" class="hidden">{4}</div>\n' +
+            '    <div id="link_{id}" class="hidden">{5}</div>\n' +
+            '    <div id="quizQ_{id}" class="hidden">{6}</div>\n' +
+            '    <div id="quizA_{id}" class="hidden">{7}</div>\n' +
+            '    <div id="hint_{id}" class="hidden">{8}</div>\n' +
+            '    <div id="index_{id}" class="hidden">{9}</div>\n' +
+            '    <div class="ppBtnDiv active">\n' +
+            '        <div id="ppBtn_{id}" class="ppBtn active" onclick="ppNext(this)">NEXT</div>\n' +
+            '    </div>' +
+        '    </div>';
+
+    let popup = new mapboxgl.Popup( { offset : 8 } );
+    const re = new RegExp('{id}', 'g');
+    const openingHours = feature.properties.openingHours != null ?
+           '<strong>Opening hours</strong><br>' + feature.properties.openingHours : 'Opening hours: N/A';
+    const admissionFee = feature.properties.admissionFee != null ?
+            '<br><strong>Admission fee</strong><br>' + feature.properties.admissionFee : '<br>Admission fee: N/A';
+    const href = feature.properties.link != null ?
+            '</br>Link: <a href="' + feature.properties.link + '" target="_blank">web link</a>' : 'N/A';
+
+    popupStructure = popupStructure.replace(re, feature.properties.id)
+                                    .replace('{1}', feature.properties.Name)
+                                    .replace('{2}', feature.properties.description)
+                                    .replace('{3}', openingHours)
+                                    .replace('{4}', admissionFee)
+                                    .replace('{5}', href)
+                                    .replace('{6}', feature.properties.quizQuestion)
+                                    .replace('{7}', feature.properties.quizAnswer)
+                                    .replace('{8}', feature.properties.hint)
+                                    .replace('{9}', feature.properties.rightAnswerIndex);
+    popup.setHTML(popupStructure);
+
+    return popup;
+}
+
+function ppNext(element) {
+    let id = element.id.split('_')[1];
+    let btnTxt = element.textContent;
+    if (btnTxt === 'NEXT'){
+        $("#ppDesc_" + id).removeClass('active').addClass('hidden');
+        $("#ppOpnHrs_" + id).addClass('active');
+        $("#ppAdmFee_" + id).addClass('active');
+        $("#link_" + id).addClass('active');
+        $('#ppBtn_' + id).text('TO QUIZ');
+    }
+    else if(btnTxt === 'TO QUIZ'){
+
+        const quizQuestion = $('#quizQ_' + id).text();
+        const quizAnswer = $('#quizA_' + id).text();
+        const hint = $('#hint_' + id).text();
+        const idx = $('#index_' + id).text();
+
+        $('.mapboxgl-popup').each( function () {
+            $(this).remove();
+        } );
+
+        inform('here will be a quiz that is not yet implemented, asking\n ' + quizQuestion)
+
+        $('#marker_' + id).addClass('visited');
+    }
+
+}
+
+
+/* An auxiliary function to add markers to the map based on passed coordinates
+*  type can be userGenerated or tripRelated
+* */
+function createMarkerAndAdd(feature, addToMap, type){
     //create container for a marker
     let markerDiv = document.createElement('div');
-    markerDiv.className = 'marker tripRelated';
+    markerDiv.className = (type === 'tripRelated') ? 'marker ' + type : 'marker hidden ' + type;
+    markerDiv.id = 'marker_' + feature.properties.id;
     //create a pop-up
-    let popup = new mapboxgl.Popup( { offset : popupOffsets, anchor : 'bottom' } ).setHTML(feature.properties.description);
+    //let popup = new mapboxgl.Popup( { offset : 8, anchor : 'bottom' } ).setHTML(feature.properties.description);
     //create a marker, set its location and popup
     let marker = new mapboxgl.Marker(markerDiv);
-    marker.setLngLat(feature.geometry.coordinates).setPopup(popup);
+    if (type === 'tripRelated') {
+        marker.setLngLat(feature.geometry.coordinates).setPopup(createPoiPopup(feature));
+    }
+    else {
+        marker.setLngLat(feature.geometry.coordinates);
+    }
 
-    if (addToMap)
-    {
-        marker.addTo(map);
-        tripRelatedMarkers.push({
-            marker: marker,
-            addedToMap: true
-        })
+    if (type === 'tripRelated'){
+        if (addToMap)
+        {
+            marker.addTo(map);
+            tripRelatedMarkers.push({
+                marker: marker,
+                addedToMap: true
+            })
+        }
+        else{
+            tripRelatedMarkers.push({
+                marker: marker,
+                addedToMap: false
+            })
+        }
     }
     else{
-        tripRelatedMarkers.push({
-            marker: marker,
-            addedToMap: false
-        })
+        marker.addTo(map);
     }
 }
 
@@ -331,7 +512,7 @@ function loadPOIs(pois) {
             let from = [userLocation.coords.longitude, userLocation.coords.latitude];
             let targets = []; //{id, coords}
             pois.features.forEach(function (feature) {
-                createMarkerAndAdd(feature, false);
+                createMarkerAndAdd(feature, false, 'tripRelated');
                 targets.push({ id : index, coords : feature.geometry.coordinates });
                 index++;
             });
@@ -365,7 +546,7 @@ function loadPOIs(pois) {
         else
         {
             pois.features.forEach(function(feature){
-                createMarkerAndAdd(feature, true);
+                createMarkerAndAdd(feature, true, 'tripRelated');
             });
         }
 }
@@ -375,11 +556,6 @@ function requestPOIsFromServer() {
         $.get("CycleJoyIO", $.param(parameters), function (response) {
             currentPOIs = response;
             loadPOIs(response);
-            /*currentPOIs.features.forEach(function(marker){
-            let f1 = document.createElement('div');
-            f1.className = 'marker';
-            new mapboxgl.Marker(f1).setLngLat(marker.geometry.coordinates).addTo(map);
-        });*/
         });
 }
 
@@ -391,10 +567,17 @@ function requestPOIifTypeChosen() {
     else{
         if(debug)
         {
-            $.ajax({ url: 'data/culture.geojson', success: function (content) {
+            $.ajax({ url: 'data/culture.json', success: function (content) {
                     currentPOIs = content;
                     mode = 'basic';
                     loadPOIs(content);
+                } });
+            $.ajax({ url: 'data/userMarkers.json', success: function (content) {
+                    userAddedLocations = content;
+                    // make community locations
+                    content.features.forEach(function(feature){
+                        createMarkerAndAdd(feature, true, 'userGenerated');
+                    });
                 } })
         }
         else
@@ -408,4 +591,13 @@ function requestPOIifTypeChosen() {
 
 function inform(message) {
     alert(message)
+}
+
+//---------------------------------------------------------------------------------------------------------------------
+//---------------------------------------------------  OTHER  ---------------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
+
+function pointInBounds(pointX, pointY, bounds) {
+    //bounds = [[bottom left], [top right]]
+    return pointX >= bounds[0][0] && pointX <= bounds[1][0] && pointY >= bounds[0][1] && pointY <= bounds[1][1];
 }
