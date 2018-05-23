@@ -92,7 +92,24 @@ map.on('click', function (evt) {
     if (drawActive){
         let lngLat = evt.lngLat;
         //TODO: set marker, add to community locations
-        let props = {};
+        let currentIds = [];
+        userAddedLocations.features.forEach(function (feature) {
+            currentIds.push(feature.properties.id.split('-')[1]);
+        });
+        currentIds.sort();
+        const order = currentIds[currentIds.length - 1] * 1 + 1;
+        const newId = 'um-' + order;
+
+        let props = {
+            "id": newId,
+            "name": "",
+            "description": "",
+            "lat": lngLat.lat,
+            "lon": lngLat.lng,
+        };
+
+        let newLocation = createLocationObjectFromProperties(props);
+        createMarkerAndAdd(newLocation, true, 'userGenerated', '');
 
         setGrab();
     }
