@@ -4,7 +4,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": "um1",
+        "id": "um-1",
         "name": "Kate's home",
         "description": "Nice place to chat",
         "lat": 48.198762928546266,
@@ -22,7 +22,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": "um2",
+        "id": "um-2",
         "name": "Max's home",
         "description": "not too clean, but welcoming",
         "lat": 48.19461501227339,
@@ -40,7 +40,7 @@
     {
       "type": "Feature",
       "properties": {
-        "id": "um3",
+        "id": "um-3",
         "name": "Luci's home",
         "description": "a place for cat lovers",
         "lat": 48.199077584352565,

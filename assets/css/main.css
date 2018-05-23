@@ -391,10 +391,10 @@ footer{
 .mapboxgl-popup-content{
     border-radius: 6px;
     padding: 12px;
-    min-height: 220px;
-    max-height: 280px;
-    min-width: 200px;
-    max-width: 250px;
+    min-height: 170px;
+    max-height: 320px;
+    min-width: 220px;
+    max-width: 280px;
     background: #f8ffff;
 }
 
@@ -410,10 +410,10 @@ footer{
 }
 
 .longDescription{
-    min-height: 160px;
-    max-height: 200px;
+    min-height: 120px;
+    max-height: 240px;
     min-width: 190px;
-    max-width: 240px;
+    max-width: 265px;
     overflow-y: scroll;
     padding: 5px 5px 10px 5px;
     background: white;
@@ -426,6 +426,8 @@ footer{
     position: relative;
     margin-top: 10px;
     text-align: center;
+    width: 100%;
+    display: inline-block;
 }
 
 .ppBtn{
@@ -468,4 +470,74 @@ footer{
 .mapboxgl-ctrl-group > button.displayed{
     background-color: #c6ced5;
     color: #e8f0f7;
+}
+
+/*
+Popup for community locations
+inspired by http://geojson.io
+*/
+
+.commLocPopupTbl{
+    display: block;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #a8a8a8;
+    max-height: 190px;
+    font-size: 11px;
+}
+
+.commLocPopupTbl tr:nth-child(even){
+    background-color: #ced5dc;
+}
+
+.commLocPopupTbl tr{
+    margin: 0;
+}
+
+.commLocPopupTbl th{
+    width: 33.33%;
+    min-width: 65px;
+    white-space: nowrap;
+    border: 1px solid #a8a8a8;
+    margin: 0;
+}
+
+.commLocPopupTbl th input{
+    text-align: center;
+    padding: 2px;
+}
+
+.commLocPopupTbl td{
+    white-space: nowrap;
+    border: 1px solid #a8a8a8;
+    padding: 2px;
+    margin: 0;
+}
+
+.commLocPopupTbl input{
+    width: 96%;
+    background: transparent;
+    font: inherit;
+    padding: 2px;
+    margin: 0;
+}
+
+.addRowBtn{
+    color: #ce231c;
+    float: right;
+    width: 35%;
+    font-family: Helvetica, sans-serif;
+    position: relative;
+    display: block;
+    cursor: pointer;
+}
+
+.addRowBtn:before{
+    display: inline-block;
+    font-family: FontAwesome;
+    font-size: 1.25em;
+    text-decoration: none;
+    margin-right: 4px;
 }

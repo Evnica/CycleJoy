@@ -1,5 +1,5 @@
 let currentPOIs; // string representation of built-in POIs
-let userAddedLocations; // string representation of user added locations
+let userAddedLocations; //  user added locations
 let mode; // 'advanced' - if location access is available, 'basic'
 let navigationEnabled = false; // true if location access granted and accuracy < 100 m
 let userLocation; // position returned by navigator
@@ -59,8 +59,6 @@ mapboxgl.accessToken = "pk.eyJ1IjoiZXZuaWNhIiwiYSI6ImNqZWxkM3UydTFrNzcycW1ldzZlM
 * */
 checkGeolocationPermit();
 
-
-
 /*
 * The app targets cyclists in Vienna, and therefore limits the map extent to Vienna region
 * */
@@ -94,6 +92,8 @@ map.on('click', function (evt) {
     if (drawActive){
         let lngLat = evt.lngLat;
         //TODO: set marker, add to community locations
+        let props = {};
+
         setGrab();
     }
 
@@ -135,6 +135,7 @@ class MapStyleControl {
         this._map = undefined;
     }
 }
+
 // toggle background style
 function changeBackgroundStyle(index){
     map.setStyle(styles[index]);
@@ -248,7 +249,13 @@ class PointDrawControl {
 
 const draw = new PointDrawControl();
 
+/*
+* Display the marker control for adding locations to the map or hide it if already displayed.
+* If community locations are not displayed on the map when editing starts, they need to be added to show users what
+* is already available.
+* */
 function toggleEditor() {
+    //TODO: prompt user to enter a code that enables the editing mode
     if(editor){
         map.removeControl(draw);
         $('#editor').removeClass('displayed').prop('title', 'Enter editor mode');
@@ -372,7 +379,6 @@ function getLocationIfAvailable(state){
 function createPoiPopup(feature){
 
     let popupStructure =
-        //    '<div id="ppImg{1}" class="hidden">{23}</div>\n' +
         '    <div class="popupContent active">\n' +
             '    <div id="name_{id}" class="active"><h2>{1}</h2></div>\n' +
             '    <div id="ppDesc_{id}" class="longDescription active">{2}</div>\n' +
@@ -412,6 +418,60 @@ function createPoiPopup(feature){
     return popup;
 }
 
+// inspired by https://github.com/mapbox/geojson.io/blob/gh-pages/src/ui/map.js
+function createCommunityLocationPopup(feature){
+
+    let customProps = '';
+    let props = Object.getOwnPropertyNames(feature.properties);
+    for (let i = 0; i < props.length; i++){
+        if (props[i] !== 'name' && props[i] !== 'description' && props[i] !== 'lat'
+                                                              && props[i] !== 'lon' && props[i] !== 'id'){
+            customProps +=
+                '<tr >' +
+                '   <th><input type="text" value="' + props[i] + '"/></th>' +
+                '   <td><input type="text" value="' + feature.properties[props[i]] + '"/></td>' +
+                '</tr>';
+        }
+    }
+
+    let popupStructure =
+        '    <div class="popupContent active">\n' +
+        '    <div id="commLoc_{id}" class="active">' +
+        '    <table id="tblCommLoc_{id}" class="commLocPopupTbl">' +
+        '        <tbody>' +
+        '           <tr >' +
+        '              <th>name</th><td><input type="text" value="' + feature.properties.name + '"/></td>' +
+        '           </tr>' +
+        '           <tr >' +
+        '              <th>description</th><td><input type="text" value="'
+                                                    + feature.properties.description + '"/></td>' +
+        '           </tr>' +
+        '           <tr >' +
+        '              <th>lat</th><td><input type="text" readonly value="'
+                                                    + feature.geometry.coordinates[1] + '"/></td>' +
+        '           </tr>' +
+        '           <tr >' +
+        '              <th>lon</th><td><input type="text" readonly value="'
+                                                    + feature.geometry.coordinates[0] + '"/></td>' +
+        '           </tr>' +
+                    customProps +
+        '        </tbody>'+
+        '    </table>' +
+        '    <div id="addRowBtn_{id}" class="addRowBtn fa fa-plus-square" onclick="addRow(this)">Add row</div>\n' +
+        '    </div>\n' +
+        '    <div class="ppBtnDiv">\n' +
+        '        <div id="ppBtn_{id}" class="ppBtn active" onclick="save(this)">Save</div>\n' +
+        '    </div>' +
+        '    </div>';
+
+    let popup = new mapboxgl.Popup( { offset : 8 } );
+    const re = new RegExp('{id}', 'g');
+    popupStructure = popupStructure.replace(re, feature.properties.id);
+    popup.setHTML(popupStructure);
+
+    return popup;
+}
+
 function ppNext(element) {
     let id = element.id.split('_')[1];
     let btnTxt = element.textContent;
@@ -440,24 +500,74 @@ function ppNext(element) {
 
 }
 
+function addRow(btn){
+    let id = $(btn).prop('id').split('_')[1];
+    $('#tblCommLoc_' + id + ' tr:last')
+        .after('<tr ><th><input type="text" value=""/></th><td><input type="text" value=""/></td></tr>' );
+}
+
+function save(btn){
+    let key, value;
+    let id = $(btn).prop('id').split('_')[1];
+    let locationObjectProperties = {"id" : id};
+    $('#tblCommLoc_' + id).find('tr').each(function (i, tr) {
+        if (i < 4){
+            key = $(tr).children().get(0).innerText;
+        }
+        else{
+            let tmp1 = $(tr).children().get(0);
+            key = tmp1.children[0].value;
+        }
+        value = $(tr).children().get(1).children[0].value;
+        locationObjectProperties[key] = value;
+
+    });
+    let savedLocation = createLocationObjectFromProperties(locationObjectProperties);
+    let idxFound = -1;
+
+    for (let i = 0; i < userAddedLocations.features.length; i++){
+        if (userAddedLocations.features[i].properties.id === savedLocation.properties.id){
+            idxFound = i;
+            break;
+        }
+    }
+    if(idxFound !== -1)
+    {
+        delete userAddedLocations.features[idxFound];
+    }
+    userAddedLocations.features[idxFound] = savedLocation;
+    console.log(JSON.stringify(userAddedLocations));
+    $('.mapboxgl-popup').each( function () {
+        $(this).remove();
+    } );
+}
+
+function createLocationObjectFromProperties(locationObjectProperties){
+    return {
+        "type": "Feature",
+        "properties" : locationObjectProperties,
+        "geometry": {
+            "type": "Point",
+            "coordinates": [locationObjectProperties.lon, locationObjectProperties.lat]
+        }
+    };
+}
 
 /* An auxiliary function to add markers to the map based on passed coordinates
 *  type can be userGenerated or tripRelated
 * */
-function createMarkerAndAdd(feature, addToMap, type){
+function createMarkerAndAdd(feature, addToMap, type, hidden){
     //create container for a marker
     let markerDiv = document.createElement('div');
-    markerDiv.className = (type === 'tripRelated') ? 'marker ' + type : 'marker hidden ' + type;
+    markerDiv.className = 'marker ' + type  + ' ' + hidden;
     markerDiv.id = 'marker_' + feature.properties.id;
-    //create a pop-up
-    //let popup = new mapboxgl.Popup( { offset : 8, anchor : 'bottom' } ).setHTML(feature.properties.description);
     //create a marker, set its location and popup
     let marker = new mapboxgl.Marker(markerDiv);
     if (type === 'tripRelated') {
         marker.setLngLat(feature.geometry.coordinates).setPopup(createPoiPopup(feature));
     }
     else {
-        marker.setLngLat(feature.geometry.coordinates);
+        marker.setLngLat(feature.geometry.coordinates).setPopup(createCommunityLocationPopup(feature));
     }
 
     if (type === 'tripRelated'){
@@ -476,6 +586,7 @@ function createMarkerAndAdd(feature, addToMap, type){
             })
         }
     }
+    // for user community locations
     else{
         marker.addTo(map);
     }
@@ -488,12 +599,6 @@ function addMarker2(coordinates){
             break;
         }
     }
-}
-
-function addMarker(coordinates){
-    let marker = document.createElement('div');
-    marker.className = 'marker';
-    new mapboxgl.Marker(marker).setLngLat(coordinates).addTo(map);
 }
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -512,7 +617,7 @@ function loadPOIs(pois) {
             let from = [userLocation.coords.longitude, userLocation.coords.latitude];
             let targets = []; //{id, coords}
             pois.features.forEach(function (feature) {
-                createMarkerAndAdd(feature, false, 'tripRelated');
+                createMarkerAndAdd(feature, false, 'tripRelated', '');
                 targets.push({ id : index, coords : feature.geometry.coordinates });
                 index++;
             });
@@ -546,18 +651,24 @@ function loadPOIs(pois) {
         else
         {
             pois.features.forEach(function(feature){
-                createMarkerAndAdd(feature, true, 'tripRelated');
+                createMarkerAndAdd(feature, true, 'tripRelated', '');
             });
         }
 }
 
-/* An auxiliary function to load JSON content from the server */
+/* An auxiliary function to load JSON POI content from the server */
 function requestPOIsFromServer() {
-        $.get("CycleJoyIO", $.param(parameters), function (response) {
-            currentPOIs = response;
-            loadPOIs(response);
-        });
+    $.get("CycleJoyIO", $.param(parameters), function (response) {
+        currentPOIs = response;
+        loadPOIs(response);
+    });
 }
+
+/* An auxiliary function to load JSON community locations content from the server */
+function requestCommunityLocationsFromServer() {
+    //TODO: implement reading a file with community locations from server
+}
+
 
 /* Preventing request to the server if no trip type was chosen (user loaded the map.html directly) */
 function requestPOIifTypeChosen() {
@@ -576,7 +687,7 @@ function requestPOIifTypeChosen() {
                     userAddedLocations = content;
                     // make community locations
                     content.features.forEach(function(feature){
-                        createMarkerAndAdd(feature, true, 'userGenerated');
+                        createMarkerAndAdd(feature, true, 'userGenerated', 'hidden');
                     });
                 } })
         }
