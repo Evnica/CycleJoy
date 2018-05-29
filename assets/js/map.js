@@ -47,7 +47,7 @@ const geoSettings = {
 
 // depending on the requested trip type, different POIs are loaded and different background maps are applied
 const url = new URL(window.location.href);
-const parameters = {
+const tripTypeParameter = {
     tripType: url.searchParams.get('tripType')
 };
 
@@ -59,7 +59,7 @@ const styles = ["mapbox://styles/mapbox/satellite-streets-v10", //satellite imag
 
 // select map style depending on the chosen trip type
 let currentStyleIndex;
-switch (parameters.tripType){
+switch (tripTypeParameter.tripType){
     case 'night':
         currentStyleIndex = 1;
         break;
@@ -538,6 +538,7 @@ function ppNext(element) {
             //TODO: implement quiz, including location check (only offer the quiz when user is near the POI)
 
             inform('here will be a quiz that is not yet implemented, asking\n ' + quizQuestion)
+
         }
         $('#marker_' + id).addClass('visited');
         $('.mapboxgl-popup').each( function () {
@@ -584,12 +585,33 @@ function save(btn){
         }
         if (idxFound !== -1) {
             delete userAddedLocations.features[idxFound];
+            userAddedLocations.features[idxFound] = savedLocation;
         }
-        userAddedLocations.features[idxFound] = savedLocation;
+        else{
+            userAddedLocations.features.push( savedLocation );
+        }
+
         console.log(JSON.stringify(userAddedLocations));
         $('.mapboxgl-popup').each(function () {
             $(this).remove();
         });
+        //TODO: update markers
+        const markersParameter = {
+            markers: JSON.stringify(userAddedLocations)
+        };
+        $.post("CycleJoyIO", $.param(markersParameter), function (response) {
+            if(response.status === 'OK'){
+                alert('SAVED!');
+                //createMarkerAndAdd(feature, true, 'userGenerated', 'hidden')
+            }
+            else if(response.status === 'EMPTY'){
+                alert('EMPTY!');
+            }
+            else{
+                alert(response.status);
+            }
+        });
+
     }
     else{
         inform('Name and description must be provided before saving a location');
@@ -661,6 +683,11 @@ function addMarker2(coordinates){
 //---------------------------------------------------------------------------------------------------------------------
 
 /*
+* Monitor changes in the user created markers and apply changes to all users
+* */
+
+
+/*
 * Load the closest POI in advanced mode after calculating the route and distance to each of the pre-defined POIs.
 * In basic mode load all POIs.
 */
@@ -713,7 +740,7 @@ function loadPOIs(pois) {
 
 /* An auxiliary function to load JSON POI content from the server */
 function requestPOIsFromServer() {
-    $.get("CycleJoyIO", $.param(parameters), function (response) {
+    $.get("CycleJoyIO", $.param(tripTypeParameter), function (response) {
         currentPOIs = response;
         loadPOIs(response);
     });
@@ -732,7 +759,7 @@ function requestCommunityLocationsFromServer() {
 
 /* Preventing request to the server if no trip type was chosen (user loaded the map.html directly) */
 function requestPOIifTypeChosen() {
-    if (parameters.tripType !== null) {
+    if (tripTypeParameter.tripType !== null) {
         requestPOIsFromServer();
     }
     //for test purposes only! will not be there in the production version
@@ -757,6 +784,11 @@ function requestPOIifTypeChosen() {
         }
     }
     requestCommunityLocationsFromServer();
+}
+
+function triggerUserAddedLocationsUpdate(){
+    //TODO: implement update
+    alert('updating!');
 }
 
 //---------------------------------------------------------------------------------------------------------------------
