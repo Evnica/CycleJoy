@@ -23,6 +23,7 @@
 
 let currentPOIs; // string representation of built-in POIs
 let userAddedLocations; //  user added locations
+let userMarkers = [];
 let mode; // 'advanced' - if location access is available, 'basic'
 let navigationEnabled = false; // true if location access granted and accuracy < 100 m
 let userLocation; // position returned by navigator
@@ -227,8 +228,15 @@ class UserGeneratedMarkersControl {
 * */
 function toggleCommunityLocations(){
     if(communityLocationsDisplayed){
-        $('.userGenerated').addClass('hidden');
+        removeAllUserAddedMarkers();
+        requestCommunityLocationsFromServer();
         $('#communityLocations').removeClass('displayed').prop('title', 'Display community locations');
+        if(editor){
+            map.removeControl(draw);
+            $('#editor').removeClass('displayed').prop('title', 'Enter editor mode');
+            setGrab();
+            editor = !editor;
+        }
     }
     else{
         $('.userGenerated').removeClass('hidden');
@@ -601,8 +609,7 @@ function save(btn){
         };
         $.post("CycleJoyIO", $.param(markersParameter), function (response) {
             if(response.status === 'OK'){
-                alert('SAVED!');
-                //createMarkerAndAdd(feature, true, 'userGenerated', 'hidden')
+                inform('Your edits have been saved')
             }
             else if(response.status === 'EMPTY'){
                 alert('EMPTY!');
@@ -666,6 +673,7 @@ function createMarkerAndAdd(feature, addToMap, type, hidden){
     // for user community locations
     else{
         marker.addTo(map);
+        userMarkers.push(marker);
     }
 }
 
@@ -678,14 +686,14 @@ function addMarker2(coordinates){
     }
 }
 
+function removeAllUserAddedMarkers(){
+    userMarkers.forEach(function(marker){
+       marker.remove();
+    });
+}
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------- SERVER and API INTERACTION -------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
-
-/*
-* Monitor changes in the user created markers and apply changes to all users
-* */
-
 
 /*
 * Load the closest POI in advanced mode after calculating the route and distance to each of the pre-defined POIs.
