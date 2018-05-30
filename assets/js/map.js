@@ -23,6 +23,7 @@
 
 let currentPOIs; // string representation of built-in POIs
 let userAddedLocations; //  user added locations
+let userMarkers = [];
 let mode; // 'advanced' - if location access is available, 'basic'
 let navigationEnabled = false; // true if location access granted and accuracy < 100 m
 let userLocation; // position returned by navigator
@@ -32,6 +33,29 @@ let debug = true; // for development purposes only, to test features without int
 let tripRelatedMarkers = [];
 let drawActive = false;
 let communityLocationsDisplayed = false;
+// possible shortest routes for the kids trip, depending on the starting point
+let kidsTripRoutes = {
+  21 : {
+      route : [22, 25, 24, 23],
+      visited : [false, false, false, false]
+  },
+  22 : {
+      route : [21, 24, 25, 23],
+      visited : [false, false, false, false]
+  },
+  23 : {
+      route : [24, 25, 22, 21],
+      visited : [false, false, false, false]
+  },
+  24 : {
+      route : [23, 25, 22, 21],
+      visited : [false, false, false, false]
+  },
+  25 : {
+      route : [22, 21, 24, 23],
+      visited : [false, false, false, false]
+  }
+};
 
 // browser detection, attribution: https://jsfiddle.net/311aLtkz/
 const isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
@@ -47,7 +71,7 @@ const geoSettings = {
 
 // depending on the requested trip type, different POIs are loaded and different background maps are applied
 const url = new URL(window.location.href);
-const parameters = {
+const tripTypeParameter = {
     tripType: url.searchParams.get('tripType')
 };
 
@@ -59,7 +83,7 @@ const styles = ["mapbox://styles/mapbox/satellite-streets-v10", //satellite imag
 
 // select map style depending on the chosen trip type
 let currentStyleIndex;
-switch (parameters.tripType){
+switch (tripTypeParameter.tripType){
     case 'night':
         currentStyleIndex = 1;
         break;
@@ -227,8 +251,15 @@ class UserGeneratedMarkersControl {
 * */
 function toggleCommunityLocations(){
     if(communityLocationsDisplayed){
-        $('.userGenerated').addClass('hidden');
+        removeAllUserAddedMarkers();
+        requestCommunityLocationsFromServer();
         $('#communityLocations').removeClass('displayed').prop('title', 'Display community locations');
+        if(editor){
+            map.removeControl(draw);
+            $('#editor').removeClass('displayed').prop('title', 'Enter editor mode');
+            setGrab();
+            editor = !editor;
+        }
     }
     else{
         $('.userGenerated').removeClass('hidden');
@@ -270,7 +301,6 @@ class PointDrawControl {
         button.className = 'icon fa fa-map-marker';
         button.title = 'Add a location';
         button.onclick = function () {
-            //TODO: implement adding a point
             canvas.style.cursor = 'crosshair'; // who would guess that this is the way to change a cursor? css for map and body will do nothing!
             drawActive = true;
 
@@ -538,6 +568,7 @@ function ppNext(element) {
             //TODO: implement quiz, including location check (only offer the quiz when user is near the POI)
 
             inform('here will be a quiz that is not yet implemented, asking\n ' + quizQuestion)
+
         }
         $('#marker_' + id).addClass('visited');
         $('.mapboxgl-popup').each( function () {
@@ -584,12 +615,32 @@ function save(btn){
         }
         if (idxFound !== -1) {
             delete userAddedLocations.features[idxFound];
+            userAddedLocations.features[idxFound] = savedLocation;
         }
-        userAddedLocations.features[idxFound] = savedLocation;
+        else{
+            userAddedLocations.features.push( savedLocation );
+        }
+
         console.log(JSON.stringify(userAddedLocations));
         $('.mapboxgl-popup').each(function () {
             $(this).remove();
         });
+        const markersParameter = {
+            markers: JSON.stringify(userAddedLocations)
+        };
+        $.post("CycleJoyIO", $.param(markersParameter), function (response) {
+            if(response.status === 'OK'){
+                inform('Your edits have been saved')
+            }
+            else if(response.status === 'EMPTY'){
+                //TODO: implement empty user locations on delete of all
+                alert('EMPTY!');
+            }
+            else{
+                alert(response.status);
+            }
+        });
+
     }
     else{
         inform('Name and description must be provided before saving a location');
@@ -644,6 +695,7 @@ function createMarkerAndAdd(feature, addToMap, type, hidden){
     // for user community locations
     else{
         marker.addTo(map);
+        userMarkers.push(marker);
     }
 }
 
@@ -656,6 +708,11 @@ function addMarker2(coordinates){
     }
 }
 
+function removeAllUserAddedMarkers(){
+    userMarkers.forEach(function(marker){
+       marker.remove();
+    });
+}
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------- SERVER and API INTERACTION -------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
@@ -713,7 +770,7 @@ function loadPOIs(pois) {
 
 /* An auxiliary function to load JSON POI content from the server */
 function requestPOIsFromServer() {
-    $.get("CycleJoyIO", $.param(parameters), function (response) {
+    $.get("CycleJoyIO", $.param(tripTypeParameter), function (response) {
         currentPOIs = response;
         loadPOIs(response);
     });
@@ -721,7 +778,6 @@ function requestPOIsFromServer() {
 
 /* An auxiliary function to load JSON community locations content from the server */
 function requestCommunityLocationsFromServer() {
-    //TODO: implement reading a file with community locations from server
     $.get("CycleJoyIO", $.param({"tripType" : "user"}), function (response) {
         userAddedLocations = response;
         response.features.forEach(function(feature){
@@ -732,7 +788,7 @@ function requestCommunityLocationsFromServer() {
 
 /* Preventing request to the server if no trip type was chosen (user loaded the map.html directly) */
 function requestPOIifTypeChosen() {
-    if (parameters.tripType !== null) {
+    if (tripTypeParameter.tripType !== null) {
         requestPOIsFromServer();
     }
     //for test purposes only! will not be there in the production version

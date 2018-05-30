@@ -3,6 +3,7 @@
     <words>
       <w>coords</w>
       <w>crosshair</w>
+      <w>cyclability</w>
       <w>geojson</w>
       <w>geolocate</w>
       <w>geolocation</w>
@@ -11,6 +12,7 @@
       <w>npmcdn</w>
       <w>onload</w>
       <w>uncombine</w>
+      <w>waypoints</w>
     </words>
   </dictionary>
 </component>
