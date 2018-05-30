@@ -33,6 +33,29 @@ let debug = true; // for development purposes only, to test features without int
 let tripRelatedMarkers = [];
 let drawActive = false;
 let communityLocationsDisplayed = false;
+// possible shortest routes for the kids trip, depending on the starting point
+let kidsTripRoutes = {
+  21 : {
+      route : [22, 25, 24, 23],
+      visited : [false, false, false, false]
+  },
+  22 : {
+      route : [21, 24, 25, 23],
+      visited : [false, false, false, false]
+  },
+  23 : {
+      route : [24, 25, 22, 21],
+      visited : [false, false, false, false]
+  },
+  24 : {
+      route : [23, 25, 22, 21],
+      visited : [false, false, false, false]
+  },
+  25 : {
+      route : [22, 21, 24, 23],
+      visited : [false, false, false, false]
+  }
+};
 
 // browser detection, attribution: https://jsfiddle.net/311aLtkz/
 const isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
@@ -278,7 +301,6 @@ class PointDrawControl {
         button.className = 'icon fa fa-map-marker';
         button.title = 'Add a location';
         button.onclick = function () {
-            //TODO: implement adding a point
             canvas.style.cursor = 'crosshair'; // who would guess that this is the way to change a cursor? css for map and body will do nothing!
             drawActive = true;
 
@@ -603,7 +625,6 @@ function save(btn){
         $('.mapboxgl-popup').each(function () {
             $(this).remove();
         });
-        //TODO: update markers
         const markersParameter = {
             markers: JSON.stringify(userAddedLocations)
         };
@@ -612,6 +633,7 @@ function save(btn){
                 inform('Your edits have been saved')
             }
             else if(response.status === 'EMPTY'){
+                //TODO: implement empty user locations on delete of all
                 alert('EMPTY!');
             }
             else{
@@ -756,7 +778,6 @@ function requestPOIsFromServer() {
 
 /* An auxiliary function to load JSON community locations content from the server */
 function requestCommunityLocationsFromServer() {
-    //TODO: implement reading a file with community locations from server
     $.get("CycleJoyIO", $.param({"tripType" : "user"}), function (response) {
         userAddedLocations = response;
         response.features.forEach(function(feature){
@@ -792,11 +813,6 @@ function requestPOIifTypeChosen() {
         }
     }
     requestCommunityLocationsFromServer();
-}
-
-function triggerUserAddedLocationsUpdate(){
-    //TODO: implement update
-    alert('updating!');
 }
 
 //---------------------------------------------------------------------------------------------------------------------
