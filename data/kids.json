@@ -46,8 +46,8 @@
         "quizAnswer": [
           "red with a white cross",
           "blue with gold stars",
-          "black, red, gold",
-          "red, white, red"
+          "black-red-gold",
+          "red-white-red"
         ],
         "rightAnswerIndex": 3,
         "hint": "The flag consists of two colors.",

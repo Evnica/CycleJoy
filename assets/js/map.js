@@ -5,7 +5,7 @@
 * and allows to create new locations adding custom attributes
 * The app tracks the user location if allowed and if the user is located in Vienna (otherwise tracking makes no sense
 * and the app switches to basic mode).
-* In the advanced mode user gets information only about the closest location. When the user is nearby, he is offered a
+* In the advanced mode user gets information only about the forward location. When the user is nearby, he is offered a
 * quiz question an gets directions to the next location.
 * In the basic mode, all the locations of the trip are displayed on load, and quiz is not available.
 * Editor mode allows to add custom locations to the map. In the current version it has open access. When time allows,
@@ -14,7 +14,7 @@
 * supported. Writing to the file after user updates the list of locations will be supported in the version 0.13.
 *
 * Date: 02.06.2018
-* Version: 0.17
+* Version: 0.18
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * All the efforts were made to reference the code that inspired creation of this file. Some of the snippets address
@@ -45,21 +45,32 @@ let kidsTripRoutes = {
         route : [22, 25, 24, 23],
         visited : [false, false, false, false]
     },
-
-    '22' : {
-        route : [21, 24, 25, 23],
-        visited : [false, false, false, false]
-    },
     '23' : {
         route : [24, 25, 22, 21],
         visited : [false, false, false, false]
-    },
-    '24' : {
-        route : [23, 25, 22, 21],
+    }
+};
+let cultureTripRoutes = {
+    '13' : {
+        route : [15, 11, 12, 14],
         visited : [false, false, false, false]
     },
-    '25' : {
-        route : [22, 21, 24, 23],
+    '14' : {
+        route : [12, 11, 15, 13],
+        visited : [false, false, false, false]
+    }
+};
+let nightTripRoutes = {
+    '32' : {
+        route : [33, 35, 31, 34],
+        visited : [false, false, false, false]
+    },
+    '34' : {
+        route : [31, 35, 33, 32],
+        visited : [false, false, false, false]
+    },
+    '35' : {
+        route : [31, 34, 33, 32],
         visited : [false, false, false, false]
     }
 };
@@ -374,7 +385,7 @@ let geolocationError = function(error){
 
 /*
 * position access granted: load position, switch to advanced mode and enable navigation for accuracy < 250 m
-* load only the closest POI
+* load only the forward POI
 */
 let geolocationGranted = function(position) {
     /*
@@ -624,14 +635,18 @@ function setQuizContainer(distance,  quizQuestion, quizAnswer){
     }
     else{
         inform('You have to be within 250m from a target location to access the quiz. Your current distance ' +
-            'to the closest target is ' + distance);
+            'to the forward target is ' + distance);
     }
 }
 
 let triesCount = 0;
-let closest = false;
+let forward;
 
 function submit(element){
+
+    if (visitedPOIsCount === 0){
+        forward = true;
+    }
 
     let btnTxt;
 
@@ -652,7 +667,6 @@ function submit(element){
                 if (visitedPOIsCount < currentPOIs.features.length -1) {
                     $('#quizQ').html('Great job! You are attentive and your answer is correct!<br> Your next target awaits!');
                     $('#quizBtn').text("FORWARD!");
-                    closest = true;
                 }
                 else { // all locations are visited
                     $('#quizQ').html('Brilliant answer! You have reached the end of this journey. Congratulations!');
@@ -671,11 +685,11 @@ function submit(element){
                 // there are still POIs to visit
                 if (answer === idx) {
                     $('#quizQ').html('Much better! Congrats!<br> Your next target awaits!');
-                    closest = true;
                 }
                 else {
                     $('#quizQ')
                         .html("Wrong. But don't worry. You will do better next time. Let's get to the next location and try there!");
+                    forward = !forward;
                 }
                 $('#quizBtn').text("FORWARD!");
             }
@@ -705,32 +719,36 @@ function submit(element){
     }
 }
 
+let color; // color of the line representing a route between target locations
+
 function navigateToTheNext(){
     visitedPOIsCount++;
 
     if(visitedPOIsCount < currentPOIs.features.length){
         let currentId = currentTarget.properties.id;
         let targetId = -1;
-
         let url;
 
         if (chosenRoute === null) {
             switch (tripTypeParameter.tripType) {
                 case 'night':
-                    // chosenRoute = nightTripRoutes[currentId];
+                    chosenRoute = nightTripRoutes[currentId];
+                    color = 'red';
                     break;
                 case 'kids':
                     chosenRoute = kidsTripRoutes[currentId];
+                    color = 'blue';
                     break;
                 case 'culture':
-                    // chosenRoute = cultureTripRoutes[currentId];
+                    chosenRoute = cultureTripRoutes[currentId];
+                    color = 'yellow';
                     break;
                 default:
                     inform('Sorry, no navigation without choosing a trip type.');
             }
         }
 
-        if (closest){
+        if (forward){
             console.log('off we go!');
             for (let i = 0; i < chosenRoute.visited.length; i++){
                 if (!chosenRoute.visited[i]){
@@ -775,7 +793,11 @@ function navigateToTheNext(){
                 }
             }
 
-            url = 'data/routes/r' + currentId + '_' + targetId + '.json';
+            url = 'https://api.mapbox.com/directions/v5/mapbox/cycling/' + startCoords[0] + ',' +
+                    startCoords[1] + ';' + currentTarget.geometry.coordinates[0] + ',' +
+                    currentTarget.geometry.coordinates[1] + '?geometries=geojson&access_token=' +
+                mapboxgl.accessToken;
+
             if(debug){
                 console.log('Requesting the data to visualize the route');
             }
@@ -804,7 +826,7 @@ function navigateToTheNext(){
                     "type": "line",
                     "source": sourceId,
                     "paint": {
-                        "line-color": "green",
+                        "line-color": color,
                         "line-opacity": 0.75,
                         "line-width": 4
                     }
@@ -829,7 +851,6 @@ function navigateToTheNext(){
                 'Please buy the developers some Red Bull so they could be more productive in the night!')
         }
     }
-    closest = false;
 }
 
 /*Add a row to the user generated location popup for custom key-value pairs*/
@@ -972,7 +993,7 @@ function removeAllUserAddedMarkers(){
 //---------------------------------------------------------------------------------------------------------------------
 
 /*
-* Load the closest POI in advanced mode after calculating the chosenRoute and distance to each of the pre-defined POIs.
+* Load the forward POI in advanced mode after calculating the chosenRoute and distance to each of the pre-defined POIs.
 * In basic mode load all POIs.
 */
 function loadPOIs(pois) {
@@ -1002,10 +1023,40 @@ function loadPOIs(pois) {
                     if (index === pois.features.length)
                     {
                         poisWithDistances.forEach(function(poi){
-                            if (poi.distance < min)
-                            {
-                                min = poi.distance;
-                                console.log('Current closest: ' + poi.feature.properties.Name);
+                            const id = poi.feature.properties.id;
+                            // for each trip type there are 2-3 possible starts of the route
+                            // need to choose the forward of these start locations to the user
+                            switch (tripTypeParameter.tripType){
+                                case 'culture':
+                                    if ( (id === 13 || id === 14) && poi.distance < min)
+                                    {
+                                        min = poi.distance;
+                                        console.log('Current closest: ' + poi.feature.properties.Name);
+                                    }
+                                    break;
+                                case 'kids':
+                                    if ( (id === 21 || id === 23) && poi.distance < min)
+                                    {
+                                        min = poi.distance;
+                                        console.log('Current closest: ' + poi.feature.properties.Name);
+                                    }
+                                    break;
+                                case 'night':
+                                    if ( (id === 32 || id === 34 || id === 35) && poi.distance < min)
+                                    {
+                                        min = poi.distance;
+                                        console.log('Current closest: ' + poi.feature.properties.Name);
+                                    }
+                                    break;
+                                    // no trip type chosen - find the forward location of all
+                                    // but it is only informative since there will be no directions
+                                default:
+                                    if ( poi.distance < min)
+                                    {
+                                        min = poi.distance;
+                                        console.log('Current closest: ' + poi.feature.properties.Name);
+                                    }
+                                    break;
                             }
                         });
                         poisWithDistances.forEach(function(poi){
@@ -1057,7 +1108,7 @@ function requestPOIifTypeChosen() {
     else{
         if(debug)
         {
-            $.ajax({ url: 'data/culture.json', success: function (content) {
+            $.ajax({ url: 'data/night.json', success: function (content) {
                     currentPOIs = content;
                     mode = 'basic';
                     loadPOIs(content);
