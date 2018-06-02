@@ -13,8 +13,8 @@
 * NB: Server interaction is implemented with the help of Java Servlets. At this point only reading of server files is
 * supported. Writing to the file after user updates the list of locations will be supported in the version 0.13.
 *
-* Date: 23.05.2018
-* Version: 0.12
+* Date: 01.06.2018
+* Version: 0.15
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * All the efforts were made to reference the code that inspired creation of this file. Some of the snippets address
@@ -22,39 +22,44 @@
 * */
 
 let currentPOIs; // string representation of built-in POIs
+let currentPopups = [];
 let userAddedLocations; //  user added locations
 let userMarkers = [];
 let mode; // 'advanced' - if location access is available, 'basic'
-let navigationEnabled = false; // true if location access granted and accuracy < 100 m
+let navigationEnabled = false; // true if location access granted and accuracy < 250 m
 let userLocation; // position returned by navigator
 let geoPermissionState; // granted, denied or prompt
 let editor = false; // if true, a tool to draw points gets displayed
 let debug = true; // for development purposes only, to test features without interaction with the server
 let tripRelatedMarkers = [];
 let drawActive = false;
+let hint; // quiz hint
+let idx; // quiz correct answer
+let currentTarget; // current target marker in the advanced mode
 let communityLocationsDisplayed = false;
 // possible shortest routes for the kids trip, depending on the starting point
 let kidsTripRoutes = {
-  21 : {
-      route : [22, 25, 24, 23],
-      visited : [false, false, false, false]
-  },
-  22 : {
-      route : [21, 24, 25, 23],
-      visited : [false, false, false, false]
-  },
-  23 : {
-      route : [24, 25, 22, 21],
-      visited : [false, false, false, false]
-  },
-  24 : {
-      route : [23, 25, 22, 21],
-      visited : [false, false, false, false]
-  },
-  25 : {
-      route : [22, 21, 24, 23],
-      visited : [false, false, false, false]
-  }
+    '21' : {
+        route : [22, 25, 24, 23],
+        visited : [false, false, false, false]
+    },
+
+    '22' : {
+        route : [21, 24, 25, 23],
+        visited : [false, false, false, false]
+    },
+    '23' : {
+        route : [24, 25, 22, 21],
+        visited : [false, false, false, false]
+    },
+    '24' : {
+        route : [23, 25, 22, 21],
+        visited : [false, false, false, false]
+    },
+    '25' : {
+        route : [22, 21, 24, 23],
+        visited : [false, false, false, false]
+    }
 };
 
 // browser detection, attribution: https://jsfiddle.net/311aLtkz/
@@ -106,10 +111,10 @@ mapboxgl.accessToken = "pk.eyJ1IjoiZXZuaWNhIiwiYSI6ImNqZWxkM3UydTFrNzcycW1ldzZlM
 * */
 checkGeolocationPermit();
 
-/*
+/*/!*
 * The app targets cyclists in Vienna, and therefore limits the map extent to Vienna region
-* */
-const bounds = [[16.130798, 48.090050], [16.620376, 48.331649]];
+* *!/
+const bounds = [[16.130798, 48.090050], [16.620376, 48.331649]];*/
 
 /*
 * The default map style is satellite
@@ -119,7 +124,8 @@ let map = new mapboxgl.Map({
     style: styles[currentStyleIndex],
     center: [16.35, 48.2],
     zoom: 13,
-    maxBounds: bounds
+    // bounds are logical, but none of us is in Vienna, so they make no sense!
+    //maxBounds: bounds
 });
 
 let canvas = map.getCanvasContainer();
@@ -324,7 +330,7 @@ const draw = new PointDrawControl();
 * is already available.
 * */
 function toggleEditor() {
-    //TODO: prompt user to enter a code that enables the editing mode
+    //TODO: prompt user to enter a code that enables the editing mode - if time permits! Not a strict requirement
     if(editor){
         map.removeControl(draw);
         $('#editor').removeClass('displayed').prop('title', 'Enter editor mode');
@@ -388,17 +394,18 @@ let geolocationGranted = function(position) {
     console.log(userLocation.coords.longitude);
     console.log(userLocation.coords.accuracy);
     mode = 'advanced';
-    if (pointInBounds(userLocation.coords.longitude, userLocation.coords.latitude, bounds)) {
+   // if (pointInBounds(userLocation.coords.longitude, userLocation.coords.latitude, bounds)) {
         map.addControl(geolocateControl, 'top-left');
 
-        if (userLocation.coords.accuracy < 250){
+        if (userLocation.coords.accuracy < 250 || debug){
             navigationEnabled = true;
         }
-    }
-    else{
-        inform('You are located outside of the game area. The app switches to basic mode');
-        mode = 'basic';
-    }
+    //}else{
+        if (!debug) {
+            inform('You are located outside of the game area. The app switches to basic mode');
+            mode = 'basic';
+        }
+  //  }
 
     requestPOIifTypeChosen();
 };
@@ -483,7 +490,6 @@ function createPoiPopup(feature){
                                     .replace('{8}', feature.properties.hint)
                                     .replace('{9}', feature.properties.rightAnswerIndex);
     popup.setHTML(popupStructure);
-
     return popup;
 }
 
@@ -559,23 +565,109 @@ function ppNext(element) {
     }
     else {
         if(btnTxt === 'TO QUIZ'){
+            // check radius; if not within 250m from the target and not debugging, then do not display quiz
+            let closeEnough = false;
 
             const quizQuestion = $('#quizQ_' + id).text();
-            const quizAnswer = $('#quizA_' + id).text();
-            const hint = $('#hint_' + id).text();
-            const idx = $('#index_' + id).text();
+            const quizAnswer = $('#quizA_' + id).text().split(',');
+            hint = $('#hint_' + id).text();
+            idx = $('#index_' + id).text();
 
-            //TODO: implement quiz, including location check (only offer the quiz when user is near the POI)
+            navigator.geolocation.getCurrentPosition(function(position){
+                userLocation = position;
+                console.log('your coords: ' + userLocation.coords.longitude + ', ' + userLocation.coords.latitude);
+                console.log('accuracy: ' + userLocation.coords.accuracy);
+                console.log('target: ' + currentTarget.geometry.coordinates);
+                const from = turf.point([userLocation.coords.longitude, userLocation.coords.latitude]);
+                const to = turf.point([currentTarget.geometry.coordinates[0], currentTarget.geometry.coordinates[1]]);
+                const distance = turf.distance(from, to);
 
-            inform('here will be a quiz that is not yet implemented, asking\n ' + quizQuestion)
+                console.log('distance: ' + distance + ' km');
 
+                closeEnough = distance < 0.25;
+
+                setQuizContainer(closeEnough, quizQuestion, quizAnswer)
+
+            }, function (error) {
+                console.warn(`ERROR(${error.code}): ${error.message}`);
+                setQuizContainer(false, id)
+            }, geoSettings);
         }
+        $('#ppBtn_' + id).text('CLOSE');
         $('#marker_' + id).addClass('visited');
         $('.mapboxgl-popup').each( function () {
             $(this).remove();
         } );
     }
+}
 
+function setQuizContainer(closeEnough,  quizQuestion, quizAnswer){
+    if (debug || closeEnough){
+        $('#quizQ').text(quizQuestion);
+        for (let i = 3; i > -1; i--){
+            $('#option' + i).html('<input  type="radio" name="quizAnswerOption" value="'
+                + i + '" checked>' + quizAnswer[i] + '<br>');
+        }
+        $('#quizContainer').removeClass('hidden');
+    }
+    else{
+        inform('You have to be within 250m from a target location to access the quiz');
+    }
+}
+
+let triesCount = 0;
+
+function submit(element){
+
+    let btnTxt = element.textContent;
+    if (btnTxt === 'SUBMIT'){
+
+        let answer = $( 'input[name=quizAnswerOption]:checked' ).val();
+        if (triesCount === 0){
+            if (answer === idx){
+                $('#quizQ').html('Great job! You are attentive and your answer is correct!<br> Your next target awaits!');
+                $('#quizA').addClass('hidden');
+                $('#quizBtn').text("FORWARD!").on('click', function(){
+                    navigateToTheNext(true);
+                    $('#quizContainer').addClass('hidden');
+                });
+            }
+            else{
+                $('#quizQ').html('Ooops, wrong answer! Try again! Hint:<br>' + hint);
+                triesCount++;
+            }
+        }
+        else{
+            $('#quizA').addClass('hidden');
+            if (answer === idx){
+                $('#quizQ').html('Much better! Congrats!<br> Your next target awaits!');
+                $('#quizBtn').text("FORWARD!").on('click', function(){
+                    navigateToTheNext(true);
+                    $('#quizContainer').addClass('hidden');
+                });
+            }
+            else{
+                $('#quizQ')
+                    .html("Wrong. But don't worry. You will do better next time. Let's get to the next location and try there!");
+                $('#quizBtn').text("FORWARD!").on('click', function(){
+                    navigateToTheNext(false);
+                    $('#quizContainer').addClass('hidden');
+                });
+            }
+
+            triesCount = 0;
+        }
+    }
+}
+
+function navigateToTheNext(closest){
+    if (closest){
+        console.log('off we go!');
+
+    }
+    else {
+        console.log('off we go, but with some loops')
+    }
 }
 
 /*Add a row to the user generated location popup for custom key-value pairs*/
@@ -626,9 +718,14 @@ function save(btn){
             $(this).remove();
         });
         const markersParameter = {
-            markers: JSON.stringify(userAddedLocations)
+            'markers': JSON.stringify(userAddedLocations)
         };
-        $.post("CycleJoyIO", $.param(markersParameter), function (response) {
+        $.ajax({
+            url: 'assets/php/write.php',
+            data : markersParameter,
+            type: 'POST'
+        });
+        /*$.post("CycleJoyIO", $.param(markersParameter), function (response) {
             if(response.status === 'OK'){
                 inform('Your edits have been saved')
             }
@@ -639,7 +736,9 @@ function save(btn){
             else{
                 alert(response.status);
             }
-        });
+        });*/
+
+
 
     }
     else{
@@ -670,7 +769,9 @@ function createMarkerAndAdd(feature, addToMap, type, hidden){
     //create a marker, set its location and popup
     let marker = new mapboxgl.Marker(markerDiv);
     if (type === 'tripRelated') {
-        marker.setLngLat(feature.geometry.coordinates).setPopup(createPoiPopup(feature));
+        let popup = createPoiPopup(feature);
+        currentPopups[feature.properties.id] = popup;
+        marker.setLngLat(feature.geometry.coordinates).setPopup(popup);
     }
     else {
         marker.setLngLat(feature.geometry.coordinates).setPopup(createCommunityLocationPopup(feature));
@@ -699,15 +800,6 @@ function createMarkerAndAdd(feature, addToMap, type, hidden){
     }
 }
 
-function addMarker2(coordinates){
-    for (let i = 0; i < tripRelatedMarkers.length; i++){
-        if(tripRelatedMarkers[i].getLngLat() === coordinates){
-            tripRelatedMarkers[i].addTo(map);
-            break;
-        }
-    }
-}
-
 function removeAllUserAddedMarkers(){
     userMarkers.forEach(function(marker){
        marker.remove();
@@ -723,17 +815,11 @@ function removeAllUserAddedMarkers(){
 */
 function loadPOIs(pois) {
         if(mode === 'advanced'){
-            let min = Infinity;
             let index = 0;
+            let min = Infinity;
             let indexOfMin;
+            let poisWithDistances = [];
             let from = [userLocation.coords.longitude, userLocation.coords.latitude];
-            let targets = []; //{id, coords}
-            pois.features.forEach(function (feature) {
-                createMarkerAndAdd(feature, false, 'tripRelated', '');
-                targets.push({ id : index, coords : feature.geometry.coordinates });
-                index++;
-            });
-            index = 0;
             let to;
             let directionsRequest;
             pois.features.forEach(function(feature){
@@ -745,17 +831,30 @@ function loadPOIs(pois) {
                     method: 'GET',
                     url: directionsRequest
                 }).done(function(data){
-                    console.log(data.waypoints[1].location);
-                    console.log(data.routes[0].distance);
-                    if (data.routes[0].distance < min){
-                        indexOfMin = index;
-                        min = data.routes[0].distance;
-                    }
+                    console.log(data.waypoints[1].location + ', ' + data.routes[0].distance);
+                    poisWithDistances.push({
+                        feature: feature,
+                        distance: data.routes[0].distance
+                    });
                     index++;
                     if (index === pois.features.length)
                     {
-                        console.log(min);
-                        addMarker2(data.waypoints[1].location);
+                        poisWithDistances.forEach(function(poi){
+                            if (poi.distance < min)
+                            {
+                                min = poi.distance;
+                                console.log('Current closest: ' + poi.feature.properties.Name);
+                            }
+                        });
+                        poisWithDistances.forEach(function(poi){
+                            if (poi.distance === min) {
+                                createMarkerAndAdd(poi.feature, true, 'tripRelated', '');
+                                currentTarget = poi.feature;
+                            }
+                            else{
+                                createMarkerAndAdd(poi.feature, false, 'tripRelated', '');
+                            }
+                        })
                     }
                 });
             })
@@ -770,20 +869,21 @@ function loadPOIs(pois) {
 
 /* An auxiliary function to load JSON POI content from the server */
 function requestPOIsFromServer() {
-    $.get("CycleJoyIO", $.param(tripTypeParameter), function (response) {
-        currentPOIs = response;
-        loadPOIs(response);
-    });
+    $.ajax({ url: 'data/' + tripTypeParameter.tripType + '.json', success: function (content) {
+            currentPOIs = content;
+            loadPOIs(content);
+        } });
 }
 
 /* An auxiliary function to load JSON community locations content from the server */
 function requestCommunityLocationsFromServer() {
-    $.get("CycleJoyIO", $.param({"tripType" : "user"}), function (response) {
-        userAddedLocations = response;
-        response.features.forEach(function(feature){
-            createMarkerAndAdd(feature, true, 'userGenerated', 'hidden');
-        });
-    });
+    $.ajax({ url: 'assets/php/data/userMarkers.json', success: function (content) {
+            userAddedLocations = content;
+            // make community locations
+            content.features.forEach(function(feature){
+                createMarkerAndAdd(feature, true, 'userGenerated', 'hidden');
+            });
+        } });
 }
 
 /* Preventing request to the server if no trip type was chosen (user loaded the map.html directly) */
@@ -800,7 +900,7 @@ function requestPOIifTypeChosen() {
                     mode = 'basic';
                     loadPOIs(content);
                 } });
-            $.ajax({ url: 'data/userMarkers.json', success: function (content) {
+            $.ajax({ url: 'assets/php/data/userMarkers.json', success: function (content) {
                     userAddedLocations = content;
                     // make community locations
                     content.features.forEach(function(feature){

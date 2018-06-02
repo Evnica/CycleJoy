@@ -18,12 +18,12 @@
         "quizQuestion": "Which animal does originally live in Austria?",
         "quizAnswer": [
           "Monkey",
-          "Delphin",
+          "Dolphin",
           "Marmot",
-          "TIger"
+          "Tiger"
         ],
         "rightAnswerIndex": 2,
-        "hint": "he animal lives in the mountains.",
+        "hint": "This animal lives in the mountains.",
         "link": "https://www.likealocalguide.com/vienna/aqua-terra-zoo"
       },
       "geometry": {

@@ -18,9 +18,28 @@ Map implementation for the BIKE Your BRAIN (aka CycleJoy) app.
     <link rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.0.4/mapbox-gl-draw.css' type='text/css' />
     <link href="assets/css/main.css" rel="stylesheet"/>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="assets/js/turf.min.js" charset="utf-8"></script>
 </head>
 <body>
 <div id="map"></div>
+<div id="quizContainer" class="hidden">
+    <div id="quizQ">Some question?</div>
+    <div id="quizA">
+        <form>
+            <label id="option0">
+            </label>
+            <label id="option1">
+            </label>
+            <label id="option2">
+            </label>
+            <label id="option3">
+            </label>
+        </form>
+    </div>
+    <div class="ppBtnDiv active">
+        <div id="quizBtn" class="ppBtn active" onclick="submit(this)">SUBMIT</div>
+    </div>
+</div>
 
 <script src="assets/js/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
