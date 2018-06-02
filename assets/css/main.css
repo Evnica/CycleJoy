@@ -1,8 +1,8 @@
 /*
 * A stylesheet for the BIKE Your BRAIN (aka CycleJoy) app.
 *
-* Date: 23.05.2018
-* Version: 0.7
+* Date: 03.06.2018
+* Version: 0.8
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * The style is inspired by https://html5up.net/ and http://geojson.io/
@@ -567,7 +567,7 @@ inspired by http://geojson.io
     margin-top: -8em;
     margin-left: -14em;
     padding: 10px;
-    border: 1px solid #cc5e56;
+    border: 1px solid #162e69;
     background-color: #f8ffff;
     border-radius: 5px;
     position:fixed;
@@ -596,7 +596,6 @@ inspired by http://geojson.io
 
     @media screen and (max-width: 270px){
         #quizContainer {
-
             font-size: 10px;
         }
     }
@@ -604,4 +603,110 @@ inspired by http://geojson.io
 #quizQ{
     font-weight: bold;
     margin-bottom: 10px;
+}
+
+#congrats{
+    z-index: 999999;
+    top: 50%;
+    left: 50%;
+    width:28em;
+    height:21em;
+    margin-top: -10em;
+    margin-left: -14em;
+    padding: 10px;
+    background-color: #162e69;
+    color: #f8ffff;
+    border-radius: 5px;
+    position:fixed;
+}
+
+    @media screen and (max-width: 500px){
+        #congrats {
+            width:24em;
+            height: 19em;
+            margin-top: -9em;
+            margin-left: -13em;
+        }
+    }
+
+    @media screen and (max-width: 425px){
+        #congrats {
+            width:20em;
+            height: 17em;
+            margin-top: -8em;
+            margin-left: -11em;
+        }
+    }
+
+    @media screen and (max-width: 360px){
+        #congrats {
+            width:16em;
+            height: 14em;
+            margin-top: -7em;
+            margin-left: -9em;
+        }
+    }
+
+    @media screen and (max-width: 270px){
+        #congrats {
+            font-size: 10px;
+        }
+    }
+
+#congratsBtn{
+    width: 30%;
+    margin: auto;
+    display: block;
+    position: relative;
+    padding: 3px;
+    background-color: #100634;
+    border: #d6dee5;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 0 0 8px 0 rgba(255, 255, 255, 0.14), 0 3px 3px 0 rgba(232, 240, 247, 0.18);
+}
+
+#firework{
+    overflow: hidden;
+    height: 14em;
+    margin: 5px;
+    border: #f8ffff;
+}
+
+    @media screen and (max-width: 500px){
+        #firework {
+            width:24em;
+            height: 12em;
+            margin-top: -9em;
+            margin-left: -13em;
+        }
+    }
+
+    @media screen and (max-width: 425px){
+        #firework {
+            width:20em;
+            height: 10em;
+            margin-top: -8em;
+            margin-left: -11em;
+        }
+    }
+
+    @media screen and (max-width: 360px){
+        #firework {
+            width:16em;
+            height: 8em;
+            margin-top: -7em;
+            margin-left: -9em;
+        }
+    }
+
+    @media screen and (max-width: 270px){
+        #firework {
+            font-size: 10px;
+        }
+    }
+
+#congratsText{
+    text-align: center;
+    margin-bottom: 8px;
 }

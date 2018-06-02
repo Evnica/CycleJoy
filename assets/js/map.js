@@ -13,8 +13,8 @@
 * NB: Server interaction is implemented with the help of Java Servlets. At this point only reading of server files is
 * supported. Writing to the file after user updates the list of locations will be supported in the version 0.13.
 *
-* Date: 02.06.2018
-* Version: 0.19
+* Date: 03.06.2018
+* Version: 0.20
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * All the efforts were made to reference the code that inspired creation of this file. Some of the snippets address
@@ -726,9 +726,7 @@ function submit(element){
     } else{
 
         $('#quizContainer').addClass('hidden');
-        inform("We would like to award your great effort. At least with a kind word =) " +
-            "You are magnificent, keep up with the good work!");
-
+        $('#congrats').removeClass('hidden');
     }
 }
 
@@ -1159,9 +1157,4 @@ function inform(message) {
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------  OTHER  ---------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
-/*Check whether a point is within a polygon (assessment of the user location; if not within Vienna region,
-* advanced mode can't be applied since tracking and routing are not applicable*/
-function pointInBounds(pointX, pointY, bounds) {
-    //bounds = [[bottom left], [top right]]
-    return pointX >= bounds[0][0] && pointX <= bounds[1][0] && pointY >= bounds[0][1] && pointY <= bounds[1][1];
-}
+
