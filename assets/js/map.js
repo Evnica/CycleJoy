@@ -14,7 +14,7 @@
 * supported. Writing to the file after user updates the list of locations will be supported in the version 0.13.
 *
 * Date: 02.06.2018
-* Version: 0.18
+* Version: 0.19
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * All the efforts were made to reference the code that inspired creation of this file. Some of the snippets address
@@ -38,8 +38,7 @@ let hint; // quiz hint
 let idx; // quiz correct answer
 let currentTarget; // current target marker in the advanced mode
 let communityLocationsDisplayed = false;
-// possible shortest routes for the kids trip, depending on the starting point
-let chosenRoute = null;
+let chosenRoute = null; // optimal route, depending on the starting point
 let kidsTripRoutes = {
     '21' : {
         route : [22, 25, 24, 23],
@@ -74,33 +73,34 @@ let nightTripRoutes = {
         visited : [false, false, false, false]
     }
 };
-
+// access token has to be restricted to a certain domain in a real world app
+mapboxgl.accessToken = "pk.eyJ1IjoiZXZuaWNhIiwiYSI6ImNqZWxkM3UydTFrNzcycW1ldzZlMGppazUifQ.0p6IptRwe8QjDHuDp9SNjQ";
 // browser detection, attribution: https://jsfiddle.net/311aLtkz/
 const isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
 //const isFirefox = typeof InstallTrigger !== 'undefined';
 const isChrome = !!window.chrome && !!window.chrome.webstore;
-
 // position retrieval settings
 const geoSettings = {
     enableHighAccuracy: false, // no real navigation is provided, a hight accuracy (~1m) position is not needed
     maximumAge        : 60000, // position no older than 1 minute since cyclists can move pretty fast
     timeout           : 30000  // give some time to users with slower reaction to think about the prompt
 };
-
 // depending on the requested trip type, different POIs are loaded and different background maps are applied
 const url = new URL(window.location.href);
 const tripTypeParameter = {
     tripType: url.searchParams.get('tripType')
 };
-
+// map styles
 const styles = ["mapbox://styles/mapbox/satellite-streets-v10", //satellite imagery with labels
                 "mapbox://styles/mapbox/dark-v9", // black background
                 "mapbox://styles/mapbox/navigation-preview-day-v2", // traffic
                 "mapbox://styles/mapbox/streets-v10" // standard map
 ];
 
-// select map style depending on the chosen trip type
-let currentStyleIndex;
+let currentStyleIndex; // select map style depending on the chosen trip type
+let routeLayers = []; // store route line layers to add them if background is switched
+let routeSources = []; // store sources for route map layers
+
 switch (tripTypeParameter.tripType){
     case 'night':
         currentStyleIndex = 1;
@@ -114,9 +114,6 @@ switch (tripTypeParameter.tripType){
     default:
         currentStyleIndex = 2;
 }
-
-// access token has to be restricted to a certain domain in a real world app
-mapboxgl.accessToken = "pk.eyJ1IjoiZXZuaWNhIiwiYSI6ImNqZWxkM3UydTFrNzcycW1ldzZlMGppazUifQ.0p6IptRwe8QjDHuDp9SNjQ";
 
 /*
 * If geolocation available in the browser, the state of geolocation permission is queried
@@ -221,6 +218,22 @@ class MapStyleControl {
 // toggle background style
 function changeBackgroundStyle(index){
     map.setStyle(styles[index]);
+    try {
+        map.on('style.load', function () {
+            if (routeLayers.length > 0) {
+
+                for (let i = 0; i < routeSources.length; i++) {
+                    map.addSource(routeSources[i].sourceId, routeSources[i].content);
+                    map.addLayer(routeLayers[i]);
+                }
+            }
+        });
+    } catch (e) {
+        // sometimes it adds the same source twice and does not like the duplicated ids
+        //the reasons are not clear, but it is a known issue with toggling backgrounds - since there is no such
+        // thing as background in mapbox, everything is just a layer
+        //nothing needs to be done since it will do the job anyway
+    }
 }
 map.addControl(new MapStyleControl(), 'top-left');
 
@@ -820,8 +833,12 @@ function navigateToTheNext(){
                         "coordinates": [startCoords]
                     }
                 };
+
+                const source = {sourceId : sourceId, content : { type: 'geojson', data: data }};
+                routeSources.push(source);
+
                 map.addSource(sourceId, { type: 'geojson', data: data });
-                map.addLayer({
+                const layer = {
                     "id": sourceId,
                     "type": "line",
                     "source": sourceId,
@@ -830,7 +847,9 @@ function navigateToTheNext(){
                         "line-opacity": 0.75,
                         "line-width": 4
                     }
-                });
+                };
+                routeLayers.push(layer);
+                map.addLayer(layer);
                 map.jumpTo({ 'center': startCoords, 'zoom': 14 });
                 let i = 0;
                 let timer = window.setInterval(function() {
