@@ -13,8 +13,8 @@
 * NB: Server interaction is implemented with the help of Java Servlets. At this point only reading of server files is
 * supported. Writing to the file after user updates the list of locations will be supported in the version 0.13.
 *
-* Date: 01.06.2018
-* Version: 0.15
+* Date: 02.06.2018
+* Version: 0.17
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * All the efforts were made to reference the code that inspired creation of this file. Some of the snippets address
@@ -32,12 +32,14 @@ let geoPermissionState; // granted, denied or prompt
 let editor = false; // if true, a tool to draw points gets displayed
 let debug = true; // for development purposes only, to test features without interaction with the server
 let tripRelatedMarkers = [];
+let visitedPOIsCount = 0;
 let drawActive = false;
 let hint; // quiz hint
 let idx; // quiz correct answer
 let currentTarget; // current target marker in the advanced mode
 let communityLocationsDisplayed = false;
 // possible shortest routes for the kids trip, depending on the starting point
+let chosenRoute = null;
 let kidsTripRoutes = {
     '21' : {
         route : [22, 25, 24, 23],
@@ -551,6 +553,14 @@ function createCommunityLocationPopup(feature){
 function ppNext(element) {
     let id = element.id.split('_')[1];
     let btnTxt = element.textContent;
+
+    if (!isOpera){
+        btnTxt = element.textContent;
+    }
+    else{
+        btnTxt = element.lastChild.data;
+    }
+
     if (btnTxt === 'NEXT'){
         $("#ppDesc_" + id).removeClass('active').addClass('hidden');
         $("#ppOpnHrs_" + id).addClass('active');
@@ -584,13 +594,12 @@ function ppNext(element) {
 
                 console.log('distance: ' + distance + ' km');
 
-                closeEnough = distance < 0.25;
-
-                setQuizContainer(closeEnough, quizQuestion, quizAnswer)
+                setQuizContainer(distance, quizQuestion, quizAnswer)
 
             }, function (error) {
                 console.warn(`ERROR(${error.code}): ${error.message}`);
-                setQuizContainer(false, id)
+                inform("An error occurred. Have you considered a job of a software tester? " +
+                    "You will be very successful in this position!");
             }, geoSettings);
         }
         $('#ppBtn_' + id).text('CLOSE');
@@ -601,9 +610,12 @@ function ppNext(element) {
     }
 }
 
-function setQuizContainer(closeEnough,  quizQuestion, quizAnswer){
-    if (debug || closeEnough){
+function setQuizContainer(distance,  quizQuestion, quizAnswer){
+
+    if (debug || distance < 0.25){
+        $('#quizBtn').text('SUBMIT');
         $('#quizQ').text(quizQuestion);
+        $('#quizA').removeClass('hidden');
         for (let i = 3; i > -1; i--){
             $('#option' + i).html('<input  type="radio" name="quizAnswerOption" value="'
                 + i + '" checked>' + quizAnswer[i] + '<br>');
@@ -611,63 +623,213 @@ function setQuizContainer(closeEnough,  quizQuestion, quizAnswer){
         $('#quizContainer').removeClass('hidden');
     }
     else{
-        inform('You have to be within 250m from a target location to access the quiz');
+        inform('You have to be within 250m from a target location to access the quiz. Your current distance ' +
+            'to the closest target is ' + distance);
     }
 }
 
 let triesCount = 0;
+let closest = false;
 
 function submit(element){
 
-    let btnTxt = element.textContent;
+    let btnTxt;
+
+    if (!isOpera){
+        btnTxt = element.textContent;
+    }
+    else{
+        btnTxt = element.lastChild.data;
+    }
+
     if (btnTxt === 'SUBMIT'){
 
         let answer = $( 'input[name=quizAnswerOption]:checked' ).val();
         if (triesCount === 0){
             if (answer === idx){
-                $('#quizQ').html('Great job! You are attentive and your answer is correct!<br> Your next target awaits!');
                 $('#quizA').addClass('hidden');
-                $('#quizBtn').text("FORWARD!").on('click', function(){
-                    navigateToTheNext(true);
-                    $('#quizContainer').addClass('hidden');
-                });
+                // check whether there are still locations to be forwarded to available
+                if (visitedPOIsCount < currentPOIs.features.length -1) {
+                    $('#quizQ').html('Great job! You are attentive and your answer is correct!<br> Your next target awaits!');
+                    $('#quizBtn').text("FORWARD!");
+                    closest = true;
+                }
+                else { // all locations are visited
+                    $('#quizQ').html('Brilliant answer! You have reached the end of this journey. Congratulations!');
+                    $('#quizBtn').text("END");
+                }
             }
             else{
                 $('#quizQ').html('Ooops, wrong answer! Try again! Hint:<br>' + hint);
                 triesCount++;
             }
         }
+        //second submission
         else{
-            $('#quizA').addClass('hidden');
-            if (answer === idx){
-                $('#quizQ').html('Much better! Congrats!<br> Your next target awaits!');
-                $('#quizBtn').text("FORWARD!").on('click', function(){
-                    navigateToTheNext(true);
-                    $('#quizContainer').addClass('hidden');
-                });
+            $('#quizA').addClass('hidden'); // no point in showing the options further
+            if (visitedPOIsCount < currentPOIs.features.length -1) {
+                // there are still POIs to visit
+                if (answer === idx) {
+                    $('#quizQ').html('Much better! Congrats!<br> Your next target awaits!');
+                    closest = true;
+                }
+                else {
+                    $('#quizQ')
+                        .html("Wrong. But don't worry. You will do better next time. Let's get to the next location and try there!");
+                }
+                $('#quizBtn').text("FORWARD!");
             }
+            // nothing more to see
             else{
-                $('#quizQ')
-                    .html("Wrong. But don't worry. You will do better next time. Let's get to the next location and try there!");
-                $('#quizBtn').text("FORWARD!").on('click', function(){
-                    navigateToTheNext(false);
-                    $('#quizContainer').addClass('hidden');
-                });
+                if (answer === idx) {
+                    $('#quizQ').html('Great answer! By the way, this is the end of the trip. Congratulations!');
+                }else{
+                    $('#quizQ').html('Well, almost right! Anyway, this is the end of the trip. ' +
+                        'This fact alone makes you a winner!');
+                }
+                $('#quizBtn').text("END");
             }
-
             triesCount = 0;
         }
+    } else if (btnTxt === 'FORWARD!'){
+
+        $('#quizContainer').addClass('hidden');
+        navigateToTheNext();
+
+    } else{
+
+        $('#quizContainer').addClass('hidden');
+        inform("We would like to award your great effort. At least with a kind word =) " +
+            "You are magnificent, keep up with the good work!");
+
     }
 }
 
-function navigateToTheNext(closest){
-    if (closest){
-        console.log('off we go!');
+function navigateToTheNext(){
+    visitedPOIsCount++;
 
+    if(visitedPOIsCount < currentPOIs.features.length){
+        let currentId = currentTarget.properties.id;
+        let targetId = -1;
+
+        let url;
+
+        if (chosenRoute === null) {
+            switch (tripTypeParameter.tripType) {
+                case 'night':
+                    // chosenRoute = nightTripRoutes[currentId];
+                    break;
+                case 'kids':
+                    chosenRoute = kidsTripRoutes[currentId];
+                    break;
+                case 'culture':
+                    // chosenRoute = cultureTripRoutes[currentId];
+                    break;
+                default:
+                    inform('Sorry, no navigation without choosing a trip type.');
+            }
+        }
+
+        if (closest){
+            console.log('off we go!');
+            for (let i = 0; i < chosenRoute.visited.length; i++){
+                if (!chosenRoute.visited[i]){
+                    targetId = chosenRoute.route[i];
+                    chosenRoute.visited[i] = true;
+                    break;
+                }
+            }
+        }
+        else {
+            console.log('off we go, but with some loops');
+            for (let i = chosenRoute.visited.length - 1; i > -1; i--){
+                if (!chosenRoute.visited[i]){
+                    targetId = chosenRoute.route[i];
+                    chosenRoute.visited[i] = true;
+                    break;
+                }
+            }
+        }
+        if(debug){
+            console.log('The next target is ' + targetId);
+        }
+        if (targetId !== -1){
+
+            const startCoords = currentTarget.geometry.coordinates;
+
+            for (let i = 0; i < currentPOIs.features.length; i++){
+                if(currentPOIs.features[i].properties.id === targetId){
+                    currentTarget = currentPOIs.features[i];
+                    break;
+                }
+            }
+
+            for (let i = 0; i < tripRelatedMarkers.length; i++){
+                let unit = tripRelatedMarkers[i];
+                if(!unit.addedToMap){
+                    if(unit.marker._element.id.split('_')[1]*1 === targetId){
+                        unit.marker.addTo(map);
+                        unit.addedToMap = true;
+                        break;
+                    }
+                }
+            }
+
+            url = 'data/routes/r' + currentId + '_' + targetId + '.json';
+            if(debug){
+                console.log('Requesting the data to visualize the route');
+            }
+            $.ajax({
+                method: 'GET',
+                url: url
+            }).done(function(data){
+                // inspired by https://www.mapbox.com/mapbox-gl-js/example/live-update-feature/
+                const sourceId = 'trace_'+currentId;
+
+                let coordinates = data.routes[0].geometry.coordinates;
+                // this is not the same as line 748, there current target was the old target that is now the starting point
+                // here currentTarget is the next POI, that should be the last point in the represented chosenRoute
+                coordinates.push(currentTarget.geometry.coordinates);
+                data = {
+                    "type": "Feature",
+                    "properties": {},
+                    "geometry": {
+                        "type": "LineString",
+                        "coordinates": [startCoords]
+                    }
+                };
+                map.addSource(sourceId, { type: 'geojson', data: data });
+                map.addLayer({
+                    "id": sourceId,
+                    "type": "line",
+                    "source": sourceId,
+                    "paint": {
+                        "line-color": "green",
+                        "line-opacity": 0.75,
+                        "line-width": 4
+                    }
+                });
+                map.jumpTo({ 'center': startCoords, 'zoom': 14 });
+                let i = 0;
+                let timer = window.setInterval(function() {
+                    if (i < coordinates.length) {
+                        data.geometry.coordinates.push(coordinates[i]);
+                        map.getSource(sourceId).setData(data);
+                        //map.panTo(coordinates[i]);
+                        i++;
+                    } else {
+                        window.clearInterval(timer);
+                    }
+                }, 100);
+
+
+            });
+        } else {
+            alert('Something went wrong. ' +
+                'Please buy the developers some Red Bull so they could be more productive in the night!')
+        }
     }
-    else {
-        console.log('off we go, but with some loops')
-    }
+    closest = false;
 }
 
 /*Add a row to the user generated location popup for custom key-value pairs*/
@@ -810,7 +972,7 @@ function removeAllUserAddedMarkers(){
 //---------------------------------------------------------------------------------------------------------------------
 
 /*
-* Load the closest POI in advanced mode after calculating the route and distance to each of the pre-defined POIs.
+* Load the closest POI in advanced mode after calculating the chosenRoute and distance to each of the pre-defined POIs.
 * In basic mode load all POIs.
 */
 function loadPOIs(pois) {
