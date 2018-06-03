@@ -555,3 +555,53 @@ inspired by http://geojson.io
     text-decoration: none;
     margin-right: 4px;
 }
+
+/* Quiz container */
+
+#quizContainer {
+    z-index: 99999;
+    top: 50%;
+    left: 50%;
+    width:28em;
+    height:auto;
+    margin-top: -8em;
+    margin-left: -14em;
+    padding: 10px;
+    border: 1px solid #cc5e56;
+    background-color: #f8ffff;
+    border-radius: 5px;
+    position:fixed;
+}
+
+    @media screen and (max-width: 500px){
+        #quizContainer {
+            width:24em;
+            margin-left: -13em;
+        }
+    }
+
+    @media screen and (max-width: 425px){
+        #quizContainer {
+            width:20em;
+            margin-left: -11em;
+        }
+    }
+
+    @media screen and (max-width: 360px){
+        #quizContainer {
+            width:16em;
+            margin-left: -9em;
+        }
+    }
+
+    @media screen and (max-width: 270px){
+        #quizContainer {
+
+            font-size: 10px;
+        }
+    }
+
+#quizQ{
+    font-weight: bold;
+    margin-bottom: 10px;
+}
