@@ -156,7 +156,7 @@ map.on('click', function (evt) {
         var lngLat = evt.lngLat;
         var currentIds = [];
         userAddedLocations.features.forEach(function (feature) {
-            currentIds.push(feature.properties.id.split('-')[1]);
+            currentIds.push(feature.properties.id.split('-')[1]* 1);
         });
         currentIds.sort();
         var order = currentIds[currentIds.length - 1] * 1 + 1;
