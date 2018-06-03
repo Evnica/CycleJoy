@@ -158,8 +158,7 @@ map.on('click', function (evt) {
         userAddedLocations.features.forEach(function (feature) {
             currentIds.push(feature.properties.id.split('-')[1]* 1);
         });
-        currentIds.sort();
-        var order = currentIds[currentIds.length - 1] * 1 + 1;
+        var order = Math.max.apply(Math, currentIds) + 1;
         var newId = 'um-' + order;
 
         var props = {
