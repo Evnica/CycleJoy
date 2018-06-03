@@ -8,7 +8,7 @@ function home(){
     window.location.href = 'index.html';
 }
 
-let FIREWORK_CANVAS_WIDTH = $('#firework').width(),
+var FIREWORK_CANVAS_WIDTH = $('#firework').width(),
     FIREWORK_CANVAS_HEIGHT = $('#firework').height(),
     mousePos = {
         x: window.innerWidth / 4,
@@ -35,7 +35,7 @@ $(document).ready(function() {
 
 // launch more rockets!!!
 $(document).mousedown(function(e) {
-    for (let i = 0; i < 5; i++) {
+    for (var i = 0; i < 5; i++) {
         launchFrom(Math.random() * FIREWORK_CANVAS_WIDTH * 2 / 3 + FIREWORK_CANVAS_WIDTH / 6);
     }
 });
@@ -46,7 +46,7 @@ function launch() {
 
 function launchFrom(x) {
     if (rockets.length < 7) {
-        let rocket = new Rocket(x);
+        var rocket = new Rocket(x);
         rocket.explosionColor = Math.floor(Math.random() * 360 / 10) * 10;
         rocket.vel.y = Math.random() * -3 - 4;
         rocket.vel.x = Math.random() * 6 - 3;
@@ -70,18 +70,18 @@ function loop() {
     context.fillStyle = "rgba(0, 0, 0, 0.05)";
     context.fillRect(0, 0, FIREWORK_CANVAS_WIDTH, FIREWORK_CANVAS_HEIGHT);
 
-    let existingRockets = [];
+    var existingRockets = [];
 
-    for (let i = 0; i < rockets.length; i++) {
+    for (var i = 0; i < rockets.length; i++) {
         // update and render
         rockets[i].update();
         rockets[i].render(context);
 
         // calculate distance with Pythagoras
-        let distance = Math.sqrt(Math.pow(mousePos.x - rockets[i].pos.x, 2) + Math.pow(mousePos.y - rockets[i].pos.y, 2));
+        var distance = Math.sqrt(Math.pow(mousePos.x - rockets[i].pos.x, 2) + Math.pow(mousePos.y - rockets[i].pos.y, 2));
 
         // random chance of 1% if rockets is above the middle
-        let randomChance = rockets[i].pos.y < (FIREWORK_CANVAS_HEIGHT * 2 / 3) ? (Math.random() * 100 <= 1) : false;
+        var randomChance = rockets[i].pos.y < (FIREWORK_CANVAS_HEIGHT * 2 / 3) ? (Math.random() * 100 <= 1) : false;
 
         /* Explosion rules
                      - 80% of screen
@@ -98,9 +98,9 @@ function loop() {
 
     rockets = existingRockets;
 
-    let existingParticles = [];
+    var existingParticles = [];
 
-    for (let i = 0; i < particles.length; i++) {
+    for (var i = 0; i < particles.length; i++) {
         particles[i].update();
 
         // render and save particles that can be rendered
@@ -168,11 +168,11 @@ Particle.prototype.render = function(c) {
 
     c.globalCompositeOperation = 'lighter';
 
-    let x = this.pos.x,
+    var x = this.pos.x,
         y = this.pos.y,
         r = this.size / 2;
 
-    let gradient = c.createRadialGradient(x, y, 0.1, x, y, r);
+    var gradient = c.createRadialGradient(x, y, 0.1, x, y, r);
     gradient.addColorStop(0.1, "rgba(255,255,255," + this.alpha + ")");
     gradient.addColorStop(0.8, "hsla(" + this.color + ", 100%, 50%, " + this.alpha + ")");
     gradient.addColorStop(1, "hsla(" + this.color + ", 100%, 50%, 0.1)");
@@ -203,14 +203,14 @@ Rocket.prototype = new Particle();
 Rocket.prototype.constructor = Rocket;
 
 Rocket.prototype.explode = function() {
-    let count = Math.random() * 10 + 80;
+    var count = Math.random() * 10 + 80;
 
-    for (let i = 0; i < count; i++) {
-        let particle = new Particle(this.pos);
-        let angle = Math.random() * Math.PI * 2;
+    for (var i = 0; i < count; i++) {
+        var particle = new Particle(this.pos);
+        var angle = Math.random() * Math.PI * 2;
 
         // emulate 3D effect by using cosine and put more particles in the middle
-        let speed = Math.cos(Math.random() * Math.PI / 2) * 15;
+        var speed = Math.cos(Math.random() * Math.PI / 2) * 15;
 
         particle.vel.x = Math.cos(angle) * speed;
         particle.vel.y = Math.sin(angle) * speed;
@@ -237,11 +237,11 @@ Rocket.prototype.render = function(c) {
 
     c.globalCompositeOperation = 'lighter';
 
-    let x = this.pos.x,
+    var x = this.pos.x,
         y = this.pos.y,
         r = this.size / 2;
 
-    let gradient = c.createRadialGradient(x, y, 0.1, x, y, r);
+    var gradient = c.createRadialGradient(x, y, 0.1, x, y, r);
     gradient.addColorStop(0.1, "rgba(255, 255, 255 ," + this.alpha + ")");
     gradient.addColorStop(1, "rgba(0, 0, 0, " + this.alpha + ")");
 
