@@ -52,11 +52,12 @@
             <br>
             After you have rent a CityBike at any station in Vienna, the route to first sight, which is the closest point
             from your current location, will be calculated and shown in the map. Once you reach the point the app will give you
-            a description about the sight. Some places are museams or restaurants, where you can decide whether you want to
+            a description about the sight. Some places are museums or restaurants, where you can decide whether you want to
             go in or just discover the sight from the outside.<br>
             <br>
             After you have explored this place and read the description you
-            will be forwarded to the quiz by clicking the button. You only have access to this question if you are close to the point.
+            will be forwarded to the quiz by clicking the button. You only have access to this question if you are within
+            250 meters of the point.
             <br>
             Is the answer right you will get the new calculated route to the next closest sight.
             <br>
@@ -70,10 +71,21 @@
 
 
         <p>
+        !! The description above is the main idea and functionality  of the application - the current app is a test version !!<br>
+
+        The app is exclusively meant to use in Vienna. Because of test purposes the route to the first sight, independent on your current
+        location will be calculated, if you give access to your location. At this sight you can read the description and
+        you are able the answer the quiz question, although you are not within the 250 meters distance of the point. In this case
+        debug is set to true, so you have the possibility to answer the question and being send to the next point dependent on your answer.
+        </p>
+        <br>
+        <p>
             IMPORTANT: If you do no permit access to your current location all sights of the chosen trip are shown in the map and
             the route will not be calculated. You can do the trip without taking part in the quiz challenge!
 
         </p>
+
+
 
     </div>
 
