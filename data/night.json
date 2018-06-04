@@ -1,166 +1,140 @@
-[
 {
-"place_id": "20619121",
-"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
-"osm_type": "node",
-"osm_id": "1968709928",
-"boundingbox": [
-"48.2099704",
-"48.2100704",
-"16.3679718",
-"16.3680718"
-],
-"lat": "48.2100204",
-"lon": "16.3680218",
-"display_name": "Night Dive, 8, Naglergasse, Widmerviertel, KG Innere Stadt, Innere Stadt, Vienna, 1010, Austria",
-"class": "amenity",
-"type": "restaurant",
-"importance": 0.21025,
-"icon": "https://nominatim.openstreetmap.org/images/mapicons/food_restaurant.p.20.png"
-},
-{
-"place_id": "8928163",
-"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
-"osm_type": "node",
-"osm_id": "902496922",
-"boundingbox": [
-"48.204795",
-"48.204895",
-"16.3759217",
-"16.3760217"
-],
-"lat": "48.204845",
-"lon": "16.3759717",
-"display_name": "Night Club Eve, 3, Schellinggasse, Stubenviertel, KG Innere Stadt, Innere Stadt, Vienna, 1010, Austria",
-"class": "amenity",
-"type": "stripclub",
-"importance": 0.21025
-},
-{
-"place_id": "26372499",
-"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
-"osm_type": "node",
-"osm_id": "2484859207",
-"boundingbox": [
-"48.2350001",
-"48.2351001",
-"16.3657645",
-"16.3658645"
-],
-"lat": "48.2350501",
-"lon": "16.3658145",
-"display_name": "Leika's Night, Klosterneuburger Straße, KG Brigittenau, Brigittenau, Vienna, 1200, Austria",
-"class": "amenity",
-"type": "cafe",
-"importance": 0.21025,
-"icon": "https://nominatim.openstreetmap.org/images/mapicons/food_cafe.p.20.png"
-},
-{
-"place_id": "217934356",
-"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
-"osm_type": "node",
-"osm_id": "5167578452",
-"boundingbox": [
-"48.2225555",
-"48.2226555",
-"16.3453778",
-"16.3454778"
-],
-"lat": "48.2226055",
-"lon": "16.3454278",
-"display_name": "Night Dream, 53, Währinger Gürtel, Währinger Cottage, KG Währing, Währing, Vienna, 1180, Austria",
-"class": "amenity",
-"type": "nightclub",
-"importance": 0.21025
-},
-{
-"place_id": "63044755",
-"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
-"osm_type": "node",
-"osm_id": "5026447762",
-"boundingbox": [
-"48.1882558",
-"48.1883558",
-"16.3535212",
-"16.3536212"
-],
-"lat": "48.1883058",
-"lon": "16.3535712",
-"display_name": "Arena Night Club, 117, Margaretenstraße, Nikolsdorf, KG Margarethen, Margareten, Vienna, 1050, Austria",
-"class": "amenity",
-"type": "nightclub",
-"importance": 0.21025
-},
-{
-"place_id": "217788485",
-"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
-"osm_type": "node",
-"osm_id": "5163059988",
-"boundingbox": [
-"48.2181328",
-"48.2182328",
-"16.343041",
-"16.343141"
-],
-"lat": "48.2181828",
-"lon": "16.343091",
-"display_name": "Vienna Night Club, 12, Währinger Gürtel, Thurygrund II, KG Alsergrund, Alsergrund, Vienna, 1090, Austria",
-"class": "amenity",
-"type": "bar;brothel",
-"importance": 0.21025
-},
-{
-"place_id": "217934355",
-"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
-"osm_type": "node",
-"osm_id": "5167578451",
-"boundingbox": [
-"48.2225434",
-"48.2226434",
-"16.3452506",
-"16.3453506"
-],
-"lat": "48.2225934",
-"lon": "16.3453006",
-"display_name": "Cornea Lobas Studio-Bar, 53, Währinger Gürtel, Währinger Cottage, KG Währing, Währing, Vienna, 1180, Austria",
-"class": "amenity",
-"type": "brothel",
-"importance": 0.11025
-},
-{
-"place_id": "32410935",
-"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
-"osm_type": "node",
-"osm_id": "2780106336",
-"boundingbox": [
-"45.8271382",
-"45.8272382",
-"1.2636567",
-"1.2637567"
-],
-"lat": "45.8271882",
-"lon": "1.2637067",
-"display_name": "Night Fever, 2, Rue Orpheroux, La Cité, Ventadour, Лимож, Верхняя Вьенна, New Aquitaine, Metropolitan France, 87000, France",
-"class": "amenity",
-"type": "nightclub",
-"importance": 0.10025
-},
-{
-"place_id": "32277934",
-"licence": "Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright",
-"osm_type": "node",
-"osm_id": "2764079532",
-"boundingbox": [
-"45.829942",
-"45.830042",
-"1.2644307",
-"1.2645307"
-],
-"lat": "45.829992",
-"lon": "1.2644807",
-"display_name": "Le Lady's Night, Boulevard de la Cité, La Cité, Carnot-Marceau, Лимож, Верхняя Вьенна, New Aquitaine, Metropolitan France, 87000, France",
-"class": "amenity",
-"type": "nightclub",
-"importance": 0.10025
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 31,
+        "Name": "Jazzland",
+        "description": "Since 1972 Jazzland is the the oldest jazzclub in Austria. You can listen to all kinds of live jazz music with international and local musicians six times a week in a 500-years old cellar below the ancient Ruprechtskirche. In addition to many Austrian Jazz musicians, more than three hundred American stars have appeared in the Jazz cellar. Jazzland also offers a menu of solid Viennese cuisine with for example the traditional Wienerschnitzel and goulasch.",
+        "openingHours": "Daily except Sunday: From 19:00 <br> Live music from 21:00",
+        "admissionFee": null,
+        "quizQuestion": "Austria’s official language is...?",
+        "quizAnswer": [
+          "Austrian",
+          "German",
+          "Australian",
+          "Dutch"
+        ],
+        "rightAnswerIndex": 1,
+        "hint": "They speak the same language as in Germany.",
+        "link": "http://www.jazzland.at/e_index.htm"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3749729,
+          48.212106
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 32,
+        "Name": "DonauTechno",
+        "description": "DonauTechno is local night club with electronic music. The building, especially the ceiling of the club has a very original architecture. DonauTechno also offers a  light show, as the entire space is illuminated with a giant slide projection, which changes daily. The drinks are relatively cheap. Locals usual order weisser spritzer (white wine mixed with sparkling water) or a beer. Also, they have a famous Wurstelstand (a sandwich - sausage stand) inside the bar and offer delish hot dogs with the famous Viennese Käsekreiner! Great if you had a few drinks already.",
+        "openingHours": "Daily from 20:00 - 4:00 am.",
+        "admissionFee": null,
+        "quizQuestion": "What does 'Wiener' mean?",
+        "quizAnswer": [
+          "Schnitzel",
+          "Hot Dog",
+          "Sausage",
+          "Viennese, local from Vienna"
+        ],
+        "rightAnswerIndex": 3,
+        "hint": "It’s no food.",
+        "link": "https://www.myguidevienna.com/nightlife/donau-techno "
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3577190999999,
+          48.2022954
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 33,
+        "Name": "Onyx Bar",
+        "description": "The ONYX bar is located on the 6th floor of the DO & CO Hotel, directly opposite of the St. Stephen's Cathedral. The generously sized glass facade offers a unique panorama with a direct view of St. Stephen's, which gleams in breathtaking light at night. A well-assorted selection of drinks, cocktails and cigars in a very cosy lounge atmosphere is the perfect place to relax. The bar views through floor-to-ceiling windows. Onyx bar is an exclusive bar in the middle of the city centre, the prices are quite expensive, but the view and atmosphere are worth it!",
+        "openingHours": "Daily from: 11:00 am - 02:00 am.",
+        "admissionFee": null,
+        "quizQuestion": "What is Wiener Schnitzel?",
+        "quizAnswer": [
+          "A chop of meat breaded and deep-fried",
+          "Hot Dogs",
+          "Type of a dog",
+          "A famous mountain"
+        ],
+        "rightAnswerIndex": 0,
+        "hint": "It is meat",
+        "link": "https://www.wien.info/en/lifestyle-scene/in-places/onyx-bar"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3715505,
+          48.208341
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 34,
+        "Name": "Chill Out - Lounge",
+        "description": "Vienna's Chill Out Lounge is characterized with its red-walled décor and comfy rattan chairs and sofas. The laid-back cocktail bar has a relaxing atmosphere, with enough cushions for a good night out to feel like a good night in.Every type of drink is available here, from whiskey and beer to something fruitier, and served from the afternoon until the early hours of the morning. There's an attractively priced Happy Hour daily between 6pm and 8pm during the week. Next to the lounge they also have a restaurant, where they serve international, traditional and vegan food.",
+        "openingHours": "Mo-Sa: 17:00-02:00 am.<br> So: 18:00-00:30 am.",
+        "admissionFee": null,
+        "quizQuestion": "What’s the German word for Austria?",
+        "quizAnswer": [
+          "Australien",
+          "Austrialand",
+          "Österreich",
+          "Arnoldland"
+        ],
+        "rightAnswerIndex": 2,
+        "hint": "It doesn’t start with an a.",
+        "link": "https://www.worldsbestbars.com/bar/vienna/innere-stadt-stephansdom/chill-out-lounge"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3721643,
+          48.2119017
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 35,
+        "Name": "Lemmon Bar",
+        "description": "Lemmon Bar is the only karaoke locale in the first district. It is a small bar which has a living room atmosphere. Wireless microphones and monitors throughout the bar make first-timers feel at ease, while seasoned performers can really get the crowd going. You can choose your desired song on request. Lemmon Bar is also famous for its exotic cocktail. Happy Hour is between 6:00 pm. and 9:00 pm. You can choose any cocktail for only 5 €. On thursday is also a special cocktail day.",
+        "openingHours": "Tu-Th: 18:00-02:00 am.<br> Fr, Sa: 18:00-04:00am. <br> Closed: Mo, Su",
+        "admissionFee": null,
+        "quizQuestion": "What is the famous Austrian white wine?",
+        "quizAnswer": [
+          "Chardonnay",
+          "Zweigelt",
+          "Grüner Veltliner",
+          "Spritzer"
+        ],
+        "rightAnswerIndex": 2,
+        "hint": "It consists of two words.",
+        "link": "http://www.lemmon.at/index"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3774466,
+          48.210173
+        ]
+      }
+    }
+  ],
+  "type": "FeatureCollection"
 }
-]

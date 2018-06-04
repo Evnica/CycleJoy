@@ -1,0 +1,146 @@
+{
+  "type": "FeatureCollection",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 21,
+        "Name": "Aqua Terra Zoo",
+        "description": "On 4000 m² you can see tropical birds, free-running monkeys, terrarium animals like crocodiles and snakes and also aquatic animals like fish, tortoises and sharks. In total more than 10000 different animals living in the Zoo. In the section of terrarium animals you can see crocodiles and poisonous snakes.The main attractions of the tropical seawater section are the huge fish-tanks, the sharks, sea turtles, many different corals, as well as gorgeous fish. The house has been built into a 2nd World war bunker.",
+        "openingHours": "Mo-We: 09:00-18:00<br> Th: 09:00-21:00<br> Fr-Su: 09:00-18:00",
+        "admissionFee": "Adult: € 18,50 <br> Child (< 15 years): € 8,50",
+        "quizQuestion": "Which animal does originally live in Austria?",
+        "quizAnswer": [
+          "Monkey",
+          "Dolphin",
+          "Marmot",
+          "Tiger"
+        ],
+        "rightAnswerIndex": 2,
+        "hint": "This animal lives in the mountains.",
+        "link": "https://www.likealocalguide.com/vienna/aqua-terra-zoo"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3529326,
+          48.1976874
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 22,
+        "Name": "ZOOM Kindermuseum",
+        "description": "The ZOOM Kindermuseum is Austria’s leading museum for children spread over 1,600m². It offers year-round exhibitions, workshops, a multimedia lab, and much more for children aged 8 months to 14 years. It also provides a comprehensive program of science education. Children use all their senses to explore the world. As the mood takes them, they can ask questions, touch, investigate, sense, and play. Objects can be handled and tried out, with active participation leading to active understanding.",
+        "openingHours": "Mo:closed<br> Tu-Fr: 8:30–16:00<br> Sa-Su: 9:45 –16:00",
+        "admissionFee": "Family ticket: € 32,00",
+        "quizQuestion": "What colors are in the Austrian flag?",
+        "quizAnswer": [
+          "red with a white cross",
+          "blue with gold stars",
+          "black-red-gold",
+          "red-white-red"
+        ],
+        "rightAnswerIndex": 3,
+        "hint": "The flag consists of two colors.",
+        "link": "https://www.mqw.at/en/institutions/zoom-kindermuseum/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.359372,
+          48.202238
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 23,
+        "Name": "Urania Sternwarte",
+        "description": "Urania Observatory isthe oldest public observatory in Austria. The great double telescope, consisting of a refracting telescope and a mirror telescope, offers you the joy of astronomical observation right in the heart of Vienna. Urania is a public educational institute and observatory in Vienna, Austria. It was built according to the plans of Art Nouveau style architect Max Fabiani at the outlet of the Wien River and was opened in 1910 by Franz Joseph I of Austria as an educational facility with a public observatory.",
+        "openingHours": "Mo, Tu, Th: 9:00-16:00<br> We-Fr: 9:00-20:00<br> Sa, Su:14:00-20:00",
+        "admissionFee": "no information",
+        "quizQuestion": "In which part of Austria is Vienna located?",
+        "quizAnswer": [
+          "North-West",
+          "North-East",
+          "South-East",
+          "South-West"
+        ],
+        "rightAnswerIndex": 1,
+        "hint": "Vienna is located close to the Slovenian border.",
+        "link": "https://www.wien.info/de/wien-fuer/familien/sightseeing/sterngucker"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.384262,
+          48.2115184
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 24,
+        "Name": "Haus der Musik",
+        "description": "The house of music is an interactive sound museum which provides a new approach to music on a playful as well as scientific level. Vienna has always been a city of musical innovation and a place where people were not afraid to try the unconventional. Haus der Musik offers their visitors a new and interactive way of music education. Besides historical aspects the main focus is on the interplay of natural and electronic sound production and the relationship between analogue and digital to build bridges between tradition and innovation.",
+        "openingHours": "Daily from 10:00 - 22:00",
+        "admissionFee": "Adult: € 13,00<br> Children (< 12 years): € 6,00",
+        "quizQuestion": "Which river flows in Vienna?",
+        "quizAnswer": [
+          "Inn",
+          "Rhine",
+          "Main",
+          "Danube"
+        ],
+        "rightAnswerIndex": 3,
+        "hint": "The river ends in the Black Sea",
+        "link": "http://www.hausdermusik.com/en"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3730233,
+          48.2038358
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": 25,
+        "Name": "Schmetterlinghaus",
+        "description": "Right in the centre of Vienna you will find a tropical oasis, peaceful and relaxing, the Imperial Butterfly House. In one of the most beautiful Art Nouveau palm houses in the world, you enter a fantastic environment of adventure and excitement, populated by one of nature‘s most gentle and colourful creatures, the butterfly.  All year round you can admire around 400 live, free flying butterflies in the Butterfly House. The plants are chosen with the needs of the butterflies in mind. Some are nectar plants providing food for the butterflies.",
+        "openingHours": "Su-Fr: 10:00-4:45<br> Sa: 10:00-18:15",
+        "admissionFee": null,
+        "quizQuestion": "What was the real title of 'Sisi', the one time empress of Austria?",
+        "quizAnswer": [
+          "Elisabeth",
+          "Maria",
+          "Antoinette",
+          "Lisa"
+        ],
+        "rightAnswerIndex": 0,
+        "hint": "Her name ends with  'h'.",
+        "link": "http://schmetterlinghaus.at/en/"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          16.3665607,
+          48.2054525
+        ]
+      }
+    }
+  ]
+}
