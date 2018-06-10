@@ -824,10 +824,10 @@ function navigateToTheNext(){
                     inform('Sorry, no navigation without choosing a trip type.');
             }
         }
-
+        var i;
         if (forward){
             console.log('off we go!');
-            for (var i = 0; i < chosenRoute.visited.length; i++){
+            for (i = 0; i < chosenRoute.visited.length; i++){
                 if (!chosenRoute.visited[i]){
                     targetId = chosenRoute.route[i];
                     chosenRoute.visited[i] = true;
@@ -837,7 +837,7 @@ function navigateToTheNext(){
         }
         else {
             console.log('off we go, but with some loops');
-            for (var i = chosenRoute.visited.length - 1; i > -1; i--){
+            for (i = chosenRoute.visited.length - 1; i > -1; i--){
                 if (!chosenRoute.visited[i]){
                     targetId = chosenRoute.route[i];
                     chosenRoute.visited[i] = true;
@@ -852,14 +852,14 @@ function navigateToTheNext(){
 
             var startCoords = currentTarget.geometry.coordinates;
 
-            for (var i = 0; i < currentPOIs.features.length; i++){
+            for (i = 0; i < currentPOIs.features.length; i++){
                 if(currentPOIs.features[i].properties.id === targetId){
                     currentTarget = currentPOIs.features[i];
                     break;
                 }
             }
 
-            for (var i = 0; i < tripRelatedMarkers.length; i++){
+            for (i = 0; i < tripRelatedMarkers.length; i++){
                 var unit = tripRelatedMarkers[i];
                 if(!unit.addedToMap){
                     if(unit.marker._element.id.split('_')[1]*1 === targetId){
@@ -914,7 +914,9 @@ function navigateToTheNext(){
                 };
                 routeLayers.push(layer);
                 map.addLayer(layer);
-                map.jumpTo({ 'center': startCoords, 'zoom': 14 });
+                var center = [(startCoords[0] + currentTarget.geometry.coordinates[0])/2,
+                                (startCoords[1] + currentTarget.geometry.coordinates[1])/2];
+                map.jumpTo({ 'center': center, 'zoom': 14 });
                 var i = 0;
                 var timer = window.setInterval(function() {
                     if (i < coordinates.length) {
