@@ -14,7 +14,7 @@
 * supported. Writing to the file after user updates the list of locations will be supported in the version 0.13.
 *
 * Date: 10.06.2018
-* Version: 0.22
+* Version: 0.24
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * All the efforts were made to reference the code that inspired creation of this file. Some of the snippets address
@@ -116,22 +116,6 @@ switch (tripTypeParameter.tripType){
         break;
     default:
         currentStyleIndex = 2;
-}
-
-if(tripTypeParameter.tripType !== ''){
-
-    var welcome = 'Hi there! Welcome to the ' + tripTypeParameter.tripType + ' trip! Your first destination is on the' +
-        ' map. Now navigate to it and read its description. Be sure to read carefully! Press "TO QUIZ" to answer a ' +
-        'question based on what you have read. If you answer correctly, the next closest destination will appear on the '
-        + 'map. If you give a wrong answer twice, the next destination may not be the closest one. Navigate to it to ' +
-        'continue your journey. Continue until you arrive to the last, 5th destination, and claim your reward =) ' +
-        'Good luck!';
-
-    $('#infoText').text(welcome);
-    $('#info').removeClass('hidden');
-}
-else{
-    window.location.href = 'index.html';
 }
 
 /*
@@ -498,6 +482,16 @@ function getLocationIfAvailable(state){
     }
 }
 
+function copyTargetCoordinatesToClipboard(){
+    var coords = currentTarget.geometry.coordinates[0] + ', ' + currentTarget.geometry.coordinates[1];
+    navigator.clipboard.writeText(coords).then(function() {
+        console.log('Async: Copying to clipboard was successful!');
+        inform('Target coordinates ['+ coords + '] were copied to the clipboard');
+    }, function(err) {
+        console.error('Async: Could not copy text: ', err);
+    });
+}
+
 //---------------------------------------------------------------------------------------------------------------------
 //-----------------------------------  CREATION of MARKERS and POP-UPs ------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
@@ -652,6 +646,7 @@ function ppNext(element) {
     }
 
     if (btnTxt === 'NEXT'){
+        $('#ppCrdBtn_' + id).addClass('hidden');
         $("#ppDesc_" + id).removeClass('active').addClass('hidden');
         $("#ppOpnHrs_" + id).addClass('active');
         $("#ppAdmFee_" + id).addClass('active');
@@ -788,6 +783,7 @@ function submit(element){
 
         $('#quizContainer').addClass('hidden');
         navigateToTheNext();
+
 
     } else{
 
@@ -927,15 +923,17 @@ function navigateToTheNext(){
                     } else {
                         window.clearInterval(timer);
                     }
-                }, 100);
+                }, 50);
 
 
             });
+            copyTargetCoordinatesToClipboard();
         } else {
-            alert('Something went wrong. ' +
+            inform('Something went wrong. ' +
                 'Please buy the developers some Red Bull so they could be more productive in the night!')
         }
     }
+
 }
 
 /*Add a row to the user generated location popup for custom key-value pairs*/
@@ -1084,7 +1082,6 @@ function loadPOIs(pois) {
         if(mode === 'advanced'){
             var index = 0;
             var min = Infinity;
-            var indexOfMin;
             var poisWithDistances = [];
             var from = [userLocation.coords.longitude, userLocation.coords.latitude];
             var to;
@@ -1146,8 +1143,28 @@ function loadPOIs(pois) {
                         poisWithDistances.forEach(function(poi){
                             if (poi.distance === min) {
                                 createMarkerAndAdd(poi.feature, true, 'tripRelated', '');
-                                map.center = poi.feature.coordinates;
+                                map.jumpTo({'center': poi.feature.geometry.coordinates, 'zoom': 14});
                                 currentTarget = poi.feature;
+
+                                if(tripTypeParameter.tripType !== '' || tripTypeParameter.tripType === null){
+
+                                    var welcome = 'Hi there! Welcome to the ' + tripTypeParameter.tripType + ' trip! ' +
+                                        'Your first destination is on the map. Now navigate to it and read its ' +
+                                        'description. Be sure to read carefully! Press "TO QUIZ" to answer a question '+
+                                        'based on what you have read. If you answer correctly, the next closest ' +
+                                        'destination will appear on the map. If you give a wrong answer twice, the ' +
+                                        'next destination may not be the closest one. Navigate to it to continue your '+
+                                        'journey. Continue until you arrive to the last, 5th destination, and claim ' +
+                                        'your reward =) Good luck!';
+                                    $('#infoText').text(welcome);
+                                    $('#info').removeClass('hidden');
+                                    copyTargetCoordinatesToClipboard();
+                                }
+                                else{
+                                    window.location.href = 'index.html';
+                                }
+
+
                             }
                             else{
                                 createMarkerAndAdd(poi.feature, false, 'tripRelated', '');
@@ -1219,13 +1236,16 @@ function requestPOIifTypeChosen() {
 /*Inform user or prompt simple actions*/
 function inform(message) {
     //TODO: style the information dialog; 2 separate versions: 1 for quiz, 1 for information only
-    $('#infoText').text(message);
-    $('#info').removeClass('hidden');
+    $('#notifyText').text(message);
+    $('#notify').removeClass('hidden');
 }
 
 function infoClose(){
     $('#info').addClass('hidden');
-    $('#infoBtn').text('CLOSE');
+}
+
+function notifyClose(){
+    $('#notify').addClass('hidden');
 }
 
 //---------------------------------------------------------------------------------------------------------------------

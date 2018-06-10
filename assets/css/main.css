@@ -2,7 +2,7 @@
 * A stylesheet for the BIKE Your BRAIN (aka CycleJoy) app.
 *
 * Date: 10.06.2018
-* Version: 0.9
+* Version: 0.10
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * The style is inspired by https://html5up.net/ and http://geojson.io/
@@ -609,6 +609,8 @@ inspired by http://geojson.io
     margin-bottom: 10px;
 }
 
+/* Congratulations to the winner */
+
 #congrats{
     z-index: 999999;
     top: 50%;
@@ -709,6 +711,8 @@ inspired by http://geojson.io
     margin-bottom: 8px;
 }
 
+/* Initial info message */
+
 #info{
     z-index: 999;
     top: 50%;
@@ -784,11 +788,69 @@ inspired by http://geojson.io
         }
     }
 
-#infoText{
+#infoText, #notifyText{
     background-color: #f8ffff;
     color: #424747;
     text-align: center;
     padding: 7px;
     margin-bottom: 8px;
+}
+
+/* Inform() function notification container */
+
+#notify{
+    z-index: 888;
+    top: 50%;
+    left: 50%;
+    width: 32em;
+    height:auto;
+    margin-top: auto;
+    margin-left: -16.5em;
+    padding: 20px 12px 12px 12px;
+    background-color: #858585;
+    color: #f8ffff;
+    border-radius: 5px;
+    position:fixed;
+
+}
+
+@media screen and (max-width: 600px){
+    #notify {
+        width:28em;
+        margin-left: -14.5em;
+    }
+}
+
+@media screen and (max-width: 500px){
+    #notify {
+        width:24em;
+        margin-left: -12.5em;
+    }
+}
+
+@media screen and (max-width: 425px){
+    #notify {
+        width:20em;
+        margin-left: -11em;
+    }
+}
+
+@media screen and (max-width: 360px){
+    #notify {
+        width:18em;
+        margin-left: -9.5em;
+        font-size: 13px;
+        line-height: 1.15;
+    }
+}
+
+@media screen and (max-width: 270px){
+    #notify {
+        width:16em;
+        margin-left: -8.5em;
+        font-size: 12px;
+        line-height: 1.15;
+        padding: 8px 6px 6px 6px;
+    }
 }
 
