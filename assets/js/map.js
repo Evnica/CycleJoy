@@ -118,6 +118,22 @@ switch (tripTypeParameter.tripType){
         currentStyleIndex = 2;
 }
 
+if(tripTypeParameter.tripType !== ''){
+
+    var welcome = 'Hi there! Welcome to the ' + tripTypeParameter.tripType + ' trip! Your first destination is on the' +
+        ' map. Now navigate to it and read its description. Be sure to read carefully! Press "TO QUIZ" to answer a ' +
+        'question based on what you have read. If you answer correctly, the next closest destination will appear on the '
+        + 'map. If you give a wrong answer twice, the next destination may not be the closest one. Navigate to it to ' +
+        'continue your journey. Continue until you arrive to the last, 5th destination, and claim your reward =) ' +
+        'Good luck!';
+
+    $('#infoText').text(welcome);
+    $('#info').removeClass('hidden');
+}
+else{
+    window.location.href = 'index.html';
+}
+
 /*
 * If geolocation available in the browser, the state of geolocation permission is queried
 * See getLocationIfAvailable(state) for further info
@@ -1128,6 +1144,7 @@ function loadPOIs(pois) {
                         poisWithDistances.forEach(function(poi){
                             if (poi.distance === min) {
                                 createMarkerAndAdd(poi.feature, true, 'tripRelated', '');
+                                map.center = poi.feature.coordinates;
                                 currentTarget = poi.feature;
                             }
                             else{
@@ -1200,7 +1217,13 @@ function requestPOIifTypeChosen() {
 /*Inform user or prompt simple actions*/
 function inform(message) {
     //TODO: style the information dialog; 2 separate versions: 1 for quiz, 1 for information only
-    alert(message)
+    $('#infoText').text(message);
+    $('#info').removeClass('hidden');
+}
+
+function infoClose(){
+    $('#info').addClass('hidden');
+    $('#infoBtn').text('CLOSE');
 }
 
 //---------------------------------------------------------------------------------------------------------------------
