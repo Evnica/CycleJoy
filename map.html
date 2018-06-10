@@ -1,7 +1,7 @@
 <!--
 Map implementation for the BIKE Your BRAIN (aka CycleJoy) app.
-* Date: 02.06.2018
-* Version: 0.5
+* Date: 03.06.2018
+* Version: 0.6
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at)
 -->
 
@@ -20,9 +20,9 @@ Map implementation for the BIKE Your BRAIN (aka CycleJoy) app.
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script src="assets/js/turf.min.js" charset="utf-8"></script>
 </head>
-<body>
+<body class="mapBody">
 <div id="map"></div>
-<div id="quizContainer" class="hidden">
+<div id="quizContainer" class="info hidden">
     <div id="quizQ">Some question?</div>
     <div id="quizA">
         <form>
@@ -40,9 +40,18 @@ Map implementation for the BIKE Your BRAIN (aka CycleJoy) app.
         <div id="quizBtn" class="ppBtn active" onclick="submit(this)">SUBMIT</div>
     </div>
 </div>
+<div id="congrats" class="hidden">
+    <div id="congratsText">Congratulations!<br>You made it to the top!</div>
+    <div id="firework">
+    </div>
+    <div class="ppBtnDiv active">
+        <div id="congratsBtn" class="ppBtn active" onclick="home()">HOME</div>
+    </div>
+</div>
 
 <script src="assets/js/jquery.min.js"></script>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="assets/js/map.js"></script>
+<script src="assets/js/firework.js"></script>
 </body>
 </html>

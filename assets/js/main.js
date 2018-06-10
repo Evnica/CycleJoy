@@ -17,7 +17,7 @@ function go(tripType) {
 
 /*When the trip type is chosen in the header, the page content is scrolled to the corresponding section*/
 function scrollToElement(id){
-    let top = 200;
+    var top = 200;
     switch (id){
         case "culturalTrip":
             top = document.getElementById( "culturalTrip" ).getOffsetTop() - ( window.innerHeight / 6 );

@@ -13,33 +13,33 @@
 * NB: Server interaction is implemented with the help of Java Servlets. At this point only reading of server files is
 * supported. Writing to the file after user updates the list of locations will be supported in the version 0.13.
 *
-* Date: 02.06.2018
-* Version: 0.19
+* Date: 03.06.2018
+* Version: 0.20
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * All the efforts were made to reference the code that inspired creation of this file. Some of the snippets address
 * examples found on jquery and mapbox websites
 * */
 
-let currentPOIs; // string representation of built-in POIs
-let currentPopups = [];
-let userAddedLocations; //  user added locations
-let userMarkers = [];
-let mode; // 'advanced' - if location access is available, 'basic'
-let navigationEnabled = false; // true if location access granted and accuracy < 250 m
-let userLocation; // position returned by navigator
-let geoPermissionState; // granted, denied or prompt
-let editor = false; // if true, a tool to draw points gets displayed
-let debug = true; // for development purposes only, to test features without interaction with the server
-let tripRelatedMarkers = [];
-let visitedPOIsCount = 0;
-let drawActive = false;
-let hint; // quiz hint
-let idx; // quiz correct answer
-let currentTarget; // current target marker in the advanced mode
-let communityLocationsDisplayed = false;
-let chosenRoute = null; // optimal route, depending on the starting point
-let kidsTripRoutes = {
+var currentPOIs; // string representation of built-in POIs
+var currentPopups = [];
+var userAddedLocations; //  user added locations
+var userMarkers = [];
+var mode; // 'advanced' - if location access is available, 'basic'
+var navigationEnabled = false; // true if location access granted and accuracy < 250 m
+var userLocation; // position returned by navigator
+var geoPermissionState; // granted, denied or prompt
+var editor = false; // if true, a tool to draw points gets displayed
+var debug = true; // for development purposes only, to test features without interaction with the server
+var tripRelatedMarkers = [];
+var visitedPOIsCount = 0;
+var drawActive = false;
+var hint; // quiz hint
+var idx; // quiz correct answer
+var currentTarget; // current target marker in the advanced mode
+var communityLocationsDisplayed = false;
+var chosenRoute = null; // optimal route, depending on the starting point
+var kidsTripRoutes = {
     '21' : {
         route : [22, 25, 24, 23],
         visited : [false, false, false, false]
@@ -49,7 +49,7 @@ let kidsTripRoutes = {
         visited : [false, false, false, false]
     }
 };
-let cultureTripRoutes = {
+var cultureTripRoutes = {
     '13' : {
         route : [15, 11, 12, 14],
         visited : [false, false, false, false]
@@ -59,7 +59,7 @@ let cultureTripRoutes = {
         visited : [false, false, false, false]
     }
 };
-let nightTripRoutes = {
+var nightTripRoutes = {
     '32' : {
         route : [33, 35, 31, 34],
         visited : [false, false, false, false]
@@ -76,30 +76,33 @@ let nightTripRoutes = {
 // access token has to be restricted to a certain domain in a real world app
 mapboxgl.accessToken = "pk.eyJ1IjoiZXZuaWNhIiwiYSI6ImNqZWxkM3UydTFrNzcycW1ldzZlMGppazUifQ.0p6IptRwe8QjDHuDp9SNjQ";
 // browser detection, attribution: https://jsfiddle.net/311aLtkz/
-const isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
-//const isFirefox = typeof InstallTrigger !== 'undefined';
-const isChrome = !!window.chrome && !!window.chrome.webstore;
+var isOpera = (!!window.opr && !!opr.addons) || !!window.opera || navigator.userAgent.indexOf(' OPR/') >= 0;
+//var isFirefox = typeof InstallTrigger !== 'undefined';
+var isChrome = !!window.chrome && !!window.chrome.webstore;
 // position retrieval settings
-const geoSettings = {
+var geoSettings = {
     enableHighAccuracy: false, // no real navigation is provided, a hight accuracy (~1m) position is not needed
     maximumAge        : 60000, // position no older than 1 minute since cyclists can move pretty fast
     timeout           : 30000  // give some time to users with slower reaction to think about the prompt
 };
 // depending on the requested trip type, different POIs are loaded and different background maps are applied
-const url = new URL(window.location.href);
-const tripTypeParameter = {
+var url = new URL(window.location.href);
+var tripTypeParameter = {
     tripType: url.searchParams.get('tripType')
 };
+
+var popupsForEditor = [];
+var popups = [];
 // map styles
-const styles = ["mapbox://styles/mapbox/satellite-streets-v10", //satellite imagery with labels
+var styles = ["mapbox://styles/mapbox/satellite-streets-v10", //satellite imagery with labels
                 "mapbox://styles/mapbox/dark-v9", // black background
                 "mapbox://styles/mapbox/navigation-preview-day-v2", // traffic
                 "mapbox://styles/mapbox/streets-v10" // standard map
 ];
 
-let currentStyleIndex; // select map style depending on the chosen trip type
-let routeLayers = []; // store route line layers to add them if background is switched
-let routeSources = []; // store sources for route map layers
+var currentStyleIndex; // select map style depending on the chosen trip type
+var routeLayers = []; // store route line layers to add them if background is switched
+var routeSources = []; // store sources for route map layers
 
 switch (tripTypeParameter.tripType){
     case 'night':
@@ -124,21 +127,21 @@ checkGeolocationPermit();
 /*/!*
 * The app targets cyclists in Vienna, and therefore limits the map extent to Vienna region
 * *!/
-const bounds = [[16.130798, 48.090050], [16.620376, 48.331649]];*/
+var bounds = [[16.130798, 48.090050], [16.620376, 48.331649]];*/
 
 /*
 * The default map style is satellite
 * */
-let map = new mapboxgl.Map({
+var map = new mapboxgl.Map({
     container: "map",
     style: styles[currentStyleIndex],
     center: [16.35, 48.2],
-    zoom: 13,
+    zoom: 13
     // bounds are logical, but none of us is in Vienna, so they make no sense!
-    //maxBounds: bounds
+    //,maxBounds: bounds
 });
 
-let canvas = map.getCanvasContainer();
+var canvas = map.getCanvasContainer();
 
 /* Change the mouse cursor to 'grab' when the editing mode is off or point has been added*/
 function setGrab(){
@@ -153,24 +156,23 @@ function setGrab(){
 // add a marker when in editing mode with the draw feature activated
 map.on('click', function (evt) {
     if (drawActive){
-        let lngLat = evt.lngLat;
-        let currentIds = [];
+        var lngLat = evt.lngLat;
+        var currentIds = [];
         userAddedLocations.features.forEach(function (feature) {
-            currentIds.push(feature.properties.id.split('-')[1]);
+            currentIds.push(feature.properties.id.split('-')[1]* 1);
         });
-        currentIds.sort();
-        const order = currentIds[currentIds.length - 1] * 1 + 1;
-        const newId = 'um-' + order;
+        var order = Math.max.apply(Math, currentIds) + 1;
+        var newId = 'um-' + order;
 
-        let props = {
+        var props = {
             "id": newId,
             "name": "",
             "description": "",
             "lat": lngLat.lat,
-            "lon": lngLat.lng,
+            "lon": lngLat.lng
         };
 
-        let newLocation = createLocationObjectFromProperties(props);
+        var newLocation = createLocationObjectFromProperties(props);
         createMarkerAndAdd(newLocation, true, 'userGenerated', '');
 
         setGrab();
@@ -187,11 +189,11 @@ $( function() {
 //------------------------------------------------ MAP CONTROLS -------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
 // map style control to toggle backgrounds
-class MapStyleControl {
-    onAdd(map) {
+function MapStyleControl() {
+    MapStyleControl.prototype.onAdd = function(map){
         this._map = map;
         this._container = document.createElement('div');
-        const button = document.createElement('button');
+        var button = document.createElement('button');
         button.className = 'icon fa fa-map';
         button.title = 'Toggle background';
         button.onclick = function () {
@@ -207,12 +209,12 @@ class MapStyleControl {
         //this._container.textContent = 'Background';
         this._container.appendChild(button);
         return this._container;
-    }
+    };
 
-    onRemove() {
+    MapStyleControl.prototype.onRemove = function() {
         this._container.parentNode.removeChild(this._container);
         this._map = undefined;
-    }
+    };
 }
 
 // toggle background style
@@ -222,7 +224,7 @@ function changeBackgroundStyle(index){
         map.on('style.load', function () {
             if (routeLayers.length > 0) {
 
-                for (let i = 0; i < routeSources.length; i++) {
+                for (var i = 0; i < routeSources.length; i++) {
                     map.addSource(routeSources[i].sourceId, routeSources[i].content);
                     map.addLayer(routeLayers[i]);
                 }
@@ -241,13 +243,13 @@ map.addControl(new MapStyleControl(), 'top-left');
 map.addControl(new mapboxgl.ScaleControl());
 
 // compass
-const nav = new mapboxgl.NavigationControl({ showZoom: false });
+var nav = new mapboxgl.NavigationControl({ showZoom: false });
 map.addControl(nav, 'top-left');
 
 /*
  * geolocation control
  * added to the map only if the user (1) allows to access his/her location and (2) is within the map bounds*/
-let geolocateControl = new mapboxgl.GeolocateControl({
+var geolocateControl = new mapboxgl.GeolocateControl({
     positionOptions: geoSettings,
     trackUserLocation: true,
     showUserLocation: true
@@ -256,11 +258,11 @@ let geolocateControl = new mapboxgl.GeolocateControl({
 /*
 * Control to toggle community locations (user generated points)
 * */
-class UserGeneratedMarkersControl {
-    onAdd(map) {
+function UserGeneratedMarkersControl() {
+    UserGeneratedMarkersControl.prototype.onAdd = function(map) {
         this._map = map;
         this._container = document.createElement('div');
-        const button = document.createElement('button');
+        var button = document.createElement('button');
         button.className = 'icon fa fa-users';
         button.id = 'communityLocations';
         button.title = 'Display community locations';
@@ -270,12 +272,12 @@ class UserGeneratedMarkersControl {
         this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
         this._container.appendChild(button);
         return this._container;
-    }
+    };
 
-    onRemove() {
+    UserGeneratedMarkersControl.prototype.onRemove = function() {
         this._container.parentNode.removeChild(this._container);
         this._map = undefined;
-    }
+    };
 }
 
 /*
@@ -300,14 +302,14 @@ function toggleCommunityLocations(){
     communityLocationsDisplayed = !communityLocationsDisplayed;
 }
 
-const communityLocationsControl = new UserGeneratedMarkersControl();
+var communityLocationsControl = new UserGeneratedMarkersControl();
 map.addControl(communityLocationsControl, 'top-right');
 
-class EditingControl {
-    onAdd(map) {
+function EditingControl() {
+    EditingControl.prototype.onAdd = function(map) {
         this._map = map;
         this._container = document.createElement('div');
-        const button = document.createElement('button');
+        var button = document.createElement('button');
         button.className = 'icon fa fa-edit';
         button.title = 'Enter editor mode';
         button.id = 'editor';
@@ -317,19 +319,19 @@ class EditingControl {
         this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
         this._container.appendChild(button);
         return this._container;
-    }
+    };
 
-    onRemove() {
+    EditingControl.prototype.onRemove = function() {
         this._container.parentNode.removeChild(this._container);
         this._map = undefined;
-    }
+    };
 }
 
-class PointDrawControl {
-    onAdd(map) {
+function PointDrawControl() {
+    PointDrawControl.prototype.onAdd = function(map) {
         this._map = map;
         this._container = document.createElement('div');
-        const button = document.createElement('button');
+        var button = document.createElement('button');
         button.className = 'icon fa fa-map-marker';
         button.title = 'Add a location';
         button.onclick = function () {
@@ -340,15 +342,15 @@ class PointDrawControl {
         this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
         this._container.appendChild(button);
         return this._container;
-    }
+    };
 
-    onRemove() {
+    PointDrawControl.prototype.onRemove = function() {
         this._container.parentNode.removeChild(this._container);
         this._map = undefined;
     }
 }
 
-const draw = new PointDrawControl();
+var draw = new PointDrawControl();
 
 /*
 * Display the marker control for adding locations to the map or hide it if already displayed.
@@ -361,6 +363,9 @@ function toggleEditor() {
         map.removeControl(draw);
         $('#editor').removeClass('displayed').prop('title', 'Enter editor mode');
         setGrab();
+        userMarkers.forEach(function (marker) {
+            marker.setPopup(popups[marker._element.id.split('-')[1]]);
+        });
     }
     else {
         map.addControl(draw, 'top-right');
@@ -368,6 +373,9 @@ function toggleEditor() {
         if (!communityLocationsDisplayed) {
             $('#communityLocations').trigger('click');
         }
+        userMarkers.forEach(function (marker) {
+            marker.setPopup(popupsForEditor[marker._element.id.split('-')[1]]);
+        });
     }
     editor = !editor;
 }
@@ -379,7 +387,7 @@ map.addControl(new EditingControl(), 'top-right');
 //---------------------------------------------------------------------------------------------------------------------
 
 // position access denied, timeout or navigator error: switch to basic mode and load all POIs relevant to the trip type
-let geolocationError = function(error){
+var geolocationError = function(error){
     /*
     *       error = {
     *           code - one of the following
@@ -389,7 +397,7 @@ let geolocationError = function(error){
                 message - Details about the error in human-readable format
             }
     */
-    console.warn(`ERROR(${error.code}): ${error.message}`);
+    console.warn('ERROR ' + error.code +': ' + error.message);
     inform("Your location could not be obtained. The app has switched to the basic functionality.");
     mode = 'basic';
 
@@ -400,7 +408,7 @@ let geolocationError = function(error){
 * position access granted: load position, switch to advanced mode and enable navigation for accuracy < 250 m
 * load only the forward POI
 */
-let geolocationGranted = function(position) {
+var geolocationGranted = function(position) {
     /*
     *   position = {
             coords: {
@@ -480,7 +488,7 @@ function getLocationIfAvailable(state){
 
 function createPoiPopup(feature){
 
-    let popupStructure =
+    var popupStructure =
         '    <div class="popupContent active">\n' +
             '    <div id="name_{id}" class="active"><h2>{1}</h2></div>\n' +
             '    <div id="ppDesc_{id}" class="longDescription active">{2}</div>\n' +
@@ -496,13 +504,13 @@ function createPoiPopup(feature){
             '    </div>' +
         '    </div>';
 
-    let popup = new mapboxgl.Popup( { offset : 8 } );
-    const re = new RegExp('{id}', 'g');
-    const openingHours = feature.properties.openingHours != null ?
+    var popup = new mapboxgl.Popup( { offset : 8 } );
+    var re = new RegExp('{id}', 'g');
+    var openingHours = feature.properties.openingHours != null ?
            '<strong>Opening hours</strong><br>' + feature.properties.openingHours : 'Opening hours: N/A';
-    const admissionFee = feature.properties.admissionFee != null ?
+    var admissionFee = feature.properties.admissionFee != null ?
             '<br><strong>Admission fee</strong><br>' + feature.properties.admissionFee : '<br>Admission fee: N/A';
-    const href = feature.properties.link != null ?
+    var href = feature.properties.link != null ?
             '</br>Link: <a href="' + feature.properties.link + '" target="_blank">web link</a>' : 'N/A';
 
     popupStructure = popupStructure.replace(re, feature.properties.id)
@@ -522,12 +530,19 @@ function createPoiPopup(feature){
 // inspired by https://github.com/mapbox/geojson.io/blob/gh-pages/src/ui/map.js
 function createCommunityLocationPopup(feature){
 
-    let customProps = '';
-    let props = Object.getOwnPropertyNames(feature.properties);
-    for (let i = 0; i < props.length; i++){
+    var customProps = '';
+    var customPropsForEditor = '';
+    var props = Object.getOwnPropertyNames(feature.properties);
+    for (var i = 0; i < props.length; i++){
         if (props[i] !== 'name' && props[i] !== 'description' && props[i] !== 'lat'
                                                               && props[i] !== 'lon' && props[i] !== 'id'){
             customProps +=
+                '<tr >' +
+                '   <th><input type="text" readonly value="' + props[i] + '"/></th>' +
+                '   <td><input type="text" readonly value="' + feature.properties[props[i]] + '"/></td>' +
+                '</tr>';
+
+            customPropsForEditor +=
                 '<tr >' +
                 '   <th><input type="text" value="' + props[i] + '"/></th>' +
                 '   <td><input type="text" value="' + feature.properties[props[i]] + '"/></td>' +
@@ -535,48 +550,83 @@ function createCommunityLocationPopup(feature){
         }
     }
 
-    let popupStructure =
+    var popupStructure =
         '    <div class="popupContent active">\n' +
         '    <div id="commLoc_{id}" class="active">' +
-        '    <table id="tblCommLoc_{id}" class="commLocPopupTbl">' +
+            '    <table id="tblCommLoc_{id}" class="commLocPopupTbl">' +
+            '        <tbody>' +
+            '           <tr >' +
+            '              <th>name</th><td><input type="text" readonly value="' + feature.properties.name + '"/></td>'+
+            '           </tr>' +
+            '           <tr >' +
+            '              <th>description</th><td><input type="text" readonly value="'
+                                                        + feature.properties.description + '"/></td>' +
+            '           </tr>' +
+            '           <tr >' +
+            '              <th>lat</th><td><input type="text" readonly value="'
+                                                        + feature.geometry.coordinates[1] + '"/></td>' +
+            '           </tr>' +
+            '           <tr >' +
+            '              <th>lon</th><td><input type="text" readonly value="'
+                                                        + feature.geometry.coordinates[0] + '"/></td>' +
+            '           </tr>' +
+                        customProps +
+            '        </tbody>'+
+            '    </table>' +
+        '    </div>\n' +
+        '    </div>';
+
+    var popupStructureForEditor =
+        '    <div class="popupContent active">\n' +
+        '    <div id="commLocEdit_{id}" class="active">' +
+        '    <table id="tblCommLocEdit_{id}" class="commLocPopupTbl">' +
         '        <tbody>' +
         '           <tr >' +
-        '              <th>name</th><td><input type="text" value="' + feature.properties.name + '"/></td>' +
+        '              <th>name</th><td><input type="text" value="' + feature.properties.name + '"/></td>'+
         '           </tr>' +
         '           <tr >' +
         '              <th>description</th><td><input type="text" value="'
-                                                    + feature.properties.description + '"/></td>' +
+                                                + feature.properties.description + '"/></td>' +
         '           </tr>' +
         '           <tr >' +
         '              <th>lat</th><td><input type="text" readonly value="'
-                                                    + feature.geometry.coordinates[1] + '"/></td>' +
+                                                + feature.geometry.coordinates[1] + '"/></td>' +
         '           </tr>' +
         '           <tr >' +
         '              <th>lon</th><td><input type="text" readonly value="'
-                                                    + feature.geometry.coordinates[0] + '"/></td>' +
+                                                + feature.geometry.coordinates[0] + '"/></td>' +
         '           </tr>' +
-                    customProps +
+                    customPropsForEditor +
         '        </tbody>'+
         '    </table>' +
-        '    <div id="addRowBtn_{id}" class="addRowBtn fa fa-plus-square" onclick="addRow(this)">Add row</div>\n' +
+        '    <div id="addRowBtn_{id}" class="addRowBtn fa fa-plus-square" onclick="addRow(this)">' +
+        'Add row' +
+        '    </div>\n' +
         '    </div>\n' +
         '    <div class="ppBtnDiv">\n' +
         '        <div id="ppBtn_{id}" class="ppBtn active" onclick="save(this)">Save</div>\n' +
         '    </div>' +
         '    </div>';
 
-    let popup = new mapboxgl.Popup( { offset : 8 } );
-    const re = new RegExp('{id}', 'g');
+    var re = new RegExp('{id}', 'g');
+
+    var popup = new mapboxgl.Popup( {offset: 8} );
     popupStructure = popupStructure.replace(re, feature.properties.id);
     popup.setHTML(popupStructure);
+    popups[feature.properties.id.split('-')[1]] = popup;
+
+    var popupForEditor = new mapboxgl.Popup( { offset : 8 } );
+    popupStructureForEditor = popupStructureForEditor.replace(re, feature.properties.id);
+    popupForEditor.setHTML(popupStructureForEditor);
+    popupsForEditor[feature.properties.id.split('-')[1]] = popupForEditor;
 
     return popup;
 }
 
 /*For trip related points, change popup content*/
 function ppNext(element) {
-    let id = element.id.split('_')[1];
-    let btnTxt = element.textContent;
+    var id = element.id.split('_')[1];
+    var btnTxt = element.textContent;
 
     if (!isOpera){
         btnTxt = element.textContent;
@@ -600,10 +650,10 @@ function ppNext(element) {
     else {
         if(btnTxt === 'TO QUIZ'){
             // check radius; if not within 250m from the target and not debugging, then do not display quiz
-            let closeEnough = false;
+            var closeEnough = false;
 
-            const quizQuestion = $('#quizQ_' + id).text();
-            const quizAnswer = $('#quizA_' + id).text().split(',');
+            var quizQuestion = $('#quizQ_' + id).text();
+            var quizAnswer = $('#quizA_' + id).text().split(',');
             hint = $('#hint_' + id).text();
             idx = $('#index_' + id).text();
 
@@ -612,16 +662,16 @@ function ppNext(element) {
                 console.log('your coords: ' + userLocation.coords.longitude + ', ' + userLocation.coords.latitude);
                 console.log('accuracy: ' + userLocation.coords.accuracy);
                 console.log('target: ' + currentTarget.geometry.coordinates);
-                const from = turf.point([userLocation.coords.longitude, userLocation.coords.latitude]);
-                const to = turf.point([currentTarget.geometry.coordinates[0], currentTarget.geometry.coordinates[1]]);
-                const distance = turf.distance(from, to);
+                var from = turf.point([userLocation.coords.longitude, userLocation.coords.latitude]);
+                var to = turf.point([currentTarget.geometry.coordinates[0], currentTarget.geometry.coordinates[1]]);
+                var distance = turf.distance(from, to);
 
                 console.log('distance: ' + distance + ' km');
 
                 setQuizContainer(distance, quizQuestion, quizAnswer)
 
             }, function (error) {
-                console.warn(`ERROR(${error.code}): ${error.message}`);
+                console.warn('ERROR ' + error.code + ': ' + error.message);
                 inform("An error occurred. Have you considered a job of a software tester? " +
                     "You will be very successful in this position!");
             }, geoSettings);
@@ -640,7 +690,7 @@ function setQuizContainer(distance,  quizQuestion, quizAnswer){
         $('#quizBtn').text('SUBMIT');
         $('#quizQ').text(quizQuestion);
         $('#quizA').removeClass('hidden');
-        for (let i = 3; i > -1; i--){
+        for (var i = 3; i > -1; i--){
             $('#option' + i).html('<input  type="radio" name="quizAnswerOption" value="'
                 + i + '" checked>' + quizAnswer[i] + '<br>');
         }
@@ -652,8 +702,8 @@ function setQuizContainer(distance,  quizQuestion, quizAnswer){
     }
 }
 
-let triesCount = 0;
-let forward;
+var triesCount = 0;
+var forward;
 
 function submit(element){
 
@@ -661,7 +711,7 @@ function submit(element){
         forward = true;
     }
 
-    let btnTxt;
+    var btnTxt;
 
     if (!isOpera){
         btnTxt = element.textContent;
@@ -672,14 +722,14 @@ function submit(element){
 
     if (btnTxt === 'SUBMIT'){
 
-        let answer = $( 'input[name=quizAnswerOption]:checked' ).val();
+        var answer = $( 'input[name=quizAnswerOption]:checked' ).val();
         if (triesCount === 0){
             if (answer === idx){
                 $('#quizA').addClass('hidden');
                 // check whether there are still locations to be forwarded to available
                 if (visitedPOIsCount < currentPOIs.features.length -1) {
                     $('#quizQ').html('Great job! You are attentive and your answer is correct!<br> Your next target awaits!');
-                    $('#quizBtn').text("FORWARD!");
+                    $('#quizBtn').text("GO!");
                 }
                 else { // all locations are visited
                     $('#quizQ').html('Brilliant answer! You have reached the end of this journey. Congratulations!');
@@ -704,7 +754,7 @@ function submit(element){
                         .html("Wrong. But don't worry. You will do better next time. Let's get to the next location and try there!");
                     forward = !forward;
                 }
-                $('#quizBtn').text("FORWARD!");
+                $('#quizBtn').text("GO!");
             }
             // nothing more to see
             else{
@@ -718,7 +768,7 @@ function submit(element){
             }
             triesCount = 0;
         }
-    } else if (btnTxt === 'FORWARD!'){
+    } else if (btnTxt === 'GO!'){
 
         $('#quizContainer').addClass('hidden');
         navigateToTheNext();
@@ -726,21 +776,19 @@ function submit(element){
     } else{
 
         $('#quizContainer').addClass('hidden');
-        inform("We would like to award your great effort. At least with a kind word =) " +
-            "You are magnificent, keep up with the good work!");
-
+        $('#congrats').removeClass('hidden');
     }
 }
 
-let color; // color of the line representing a route between target locations
+var color; // color of the line representing a route between target locations
 
 function navigateToTheNext(){
     visitedPOIsCount++;
 
     if(visitedPOIsCount < currentPOIs.features.length){
-        let currentId = currentTarget.properties.id;
-        let targetId = -1;
-        let url;
+        var currentId = currentTarget.properties.id;
+        var targetId = -1;
+        var url;
 
         if (chosenRoute === null) {
             switch (tripTypeParameter.tripType) {
@@ -763,7 +811,7 @@ function navigateToTheNext(){
 
         if (forward){
             console.log('off we go!');
-            for (let i = 0; i < chosenRoute.visited.length; i++){
+            for (var i = 0; i < chosenRoute.visited.length; i++){
                 if (!chosenRoute.visited[i]){
                     targetId = chosenRoute.route[i];
                     chosenRoute.visited[i] = true;
@@ -773,7 +821,7 @@ function navigateToTheNext(){
         }
         else {
             console.log('off we go, but with some loops');
-            for (let i = chosenRoute.visited.length - 1; i > -1; i--){
+            for (var i = chosenRoute.visited.length - 1; i > -1; i--){
                 if (!chosenRoute.visited[i]){
                     targetId = chosenRoute.route[i];
                     chosenRoute.visited[i] = true;
@@ -786,17 +834,17 @@ function navigateToTheNext(){
         }
         if (targetId !== -1){
 
-            const startCoords = currentTarget.geometry.coordinates;
+            var startCoords = currentTarget.geometry.coordinates;
 
-            for (let i = 0; i < currentPOIs.features.length; i++){
+            for (var i = 0; i < currentPOIs.features.length; i++){
                 if(currentPOIs.features[i].properties.id === targetId){
                     currentTarget = currentPOIs.features[i];
                     break;
                 }
             }
 
-            for (let i = 0; i < tripRelatedMarkers.length; i++){
-                let unit = tripRelatedMarkers[i];
+            for (var i = 0; i < tripRelatedMarkers.length; i++){
+                var unit = tripRelatedMarkers[i];
                 if(!unit.addedToMap){
                     if(unit.marker._element.id.split('_')[1]*1 === targetId){
                         unit.marker.addTo(map);
@@ -819,9 +867,9 @@ function navigateToTheNext(){
                 url: url
             }).done(function(data){
                 // inspired by https://www.mapbox.com/mapbox-gl-js/example/live-update-feature/
-                const sourceId = 'trace_'+currentId;
+                var sourceId = 'trace_'+currentId;
 
-                let coordinates = data.routes[0].geometry.coordinates;
+                var coordinates = data.routes[0].geometry.coordinates;
                 // this is not the same as line 748, there current target was the old target that is now the starting point
                 // here currentTarget is the next POI, that should be the last point in the represented chosenRoute
                 coordinates.push(currentTarget.geometry.coordinates);
@@ -834,11 +882,11 @@ function navigateToTheNext(){
                     }
                 };
 
-                const source = {sourceId : sourceId, content : { type: 'geojson', data: data }};
+                var source = {sourceId : sourceId, content : { type: 'geojson', data: data }};
                 routeSources.push(source);
 
                 map.addSource(sourceId, { type: 'geojson', data: data });
-                const layer = {
+                var layer = {
                     "id": sourceId,
                     "type": "line",
                     "source": sourceId,
@@ -851,8 +899,8 @@ function navigateToTheNext(){
                 routeLayers.push(layer);
                 map.addLayer(layer);
                 map.jumpTo({ 'center': startCoords, 'zoom': 14 });
-                let i = 0;
-                let timer = window.setInterval(function() {
+                var i = 0;
+                var timer = window.setInterval(function() {
                     if (i < coordinates.length) {
                         data.geometry.coordinates.push(coordinates[i]);
                         map.getSource(sourceId).setData(data);
@@ -874,22 +922,22 @@ function navigateToTheNext(){
 
 /*Add a row to the user generated location popup for custom key-value pairs*/
 function addRow(btn){
-    let id = $(btn).prop('id').split('_')[1];
-    $('#tblCommLoc_' + id + ' tr:last')
+    var id = $(btn).prop('id').split('_')[1];
+    $('#tblCommLocEdit_' + id + ' tr:last')
         .after('<tr ><th><input type="text" value=""/></th><td><input type="text" value=""/></td></tr>' );
 }
 
 /*Save the content of the user generated location popup in case name and description are specified*/
 function save(btn){
-    let key, value;
-    let id = $(btn).prop('id').split('_')[1];
-    let locationObjectProperties = {"id" : id};
-    $('#tblCommLoc_' + id).find('tr').each(function (i, tr) {
+    var key, value;
+    var id = $(btn).prop('id').split('_')[1];
+    var locationObjectProperties = {"id" : id};
+    $('#tblCommLocEdit_' + id).find('tr').each(function (i, tr) {
         if (i < 4){
             key = $(tr).children().get(0).innerText;
         }
         else{
-            let tmp1 = $(tr).children().get(0);
+            var tmp1 = $(tr).children().get(0);
             key = tmp1.children[0].value;
         }
         value = $(tr).children().get(1).children[0].value;
@@ -898,10 +946,10 @@ function save(btn){
     });
 
     if (locationObjectProperties.name !== '' && locationObjectProperties.description !== '') {
-        let savedLocation = createLocationObjectFromProperties(locationObjectProperties);
-        let idxFound = -1;
+        var savedLocation = createLocationObjectFromProperties(locationObjectProperties);
+        var idxFound = -1;
 
-        for (let i = 0; i < userAddedLocations.features.length; i++) {
+        for (var i = 0; i < userAddedLocations.features.length; i++) {
             if (userAddedLocations.features[i].properties.id === savedLocation.properties.id) {
                 idxFound = i;
                 break;
@@ -915,11 +963,13 @@ function save(btn){
             userAddedLocations.features.push( savedLocation );
         }
 
-        console.log(JSON.stringify(userAddedLocations));
+        createCommunityLocationPopup(savedLocation);
+
+        if(debug) {console.log(JSON.stringify(userAddedLocations));}
         $('.mapboxgl-popup').each(function () {
             $(this).remove();
         });
-        const markersParameter = {
+        var markersParameter = {
             'markers': JSON.stringify(userAddedLocations)
         };
         $.ajax({
@@ -939,9 +989,6 @@ function save(btn){
                 alert(response.status);
             }
         });*/
-
-
-
     }
     else{
         inform('Name and description must be provided before saving a location');
@@ -965,13 +1012,13 @@ function createLocationObjectFromProperties(locationObjectProperties){
 * */
 function createMarkerAndAdd(feature, addToMap, type, hidden){
     //create container for a marker
-    let markerDiv = document.createElement('div');
+    var markerDiv = document.createElement('div');
     markerDiv.className = 'marker ' + type  + ' ' + hidden;
     markerDiv.id = 'marker_' + feature.properties.id;
     //create a marker, set its location and popup
-    let marker = new mapboxgl.Marker(markerDiv);
+    var marker = new mapboxgl.Marker(markerDiv);
     if (type === 'tripRelated') {
-        let popup = createPoiPopup(feature);
+        var popup = createPoiPopup(feature);
         currentPopups[feature.properties.id] = popup;
         marker.setLngLat(feature.geometry.coordinates).setPopup(popup);
     }
@@ -1017,13 +1064,13 @@ function removeAllUserAddedMarkers(){
 */
 function loadPOIs(pois) {
         if(mode === 'advanced'){
-            let index = 0;
-            let min = Infinity;
-            let indexOfMin;
-            let poisWithDistances = [];
-            let from = [userLocation.coords.longitude, userLocation.coords.latitude];
-            let to;
-            let directionsRequest;
+            var index = 0;
+            var min = Infinity;
+            var indexOfMin;
+            var poisWithDistances = [];
+            var from = [userLocation.coords.longitude, userLocation.coords.latitude];
+            var to;
+            var directionsRequest;
             pois.features.forEach(function(feature){
                 to = feature.geometry.coordinates;
                 directionsRequest = 'https://api.mapbox.com/directions/v5/mapbox/cycling/' + from[0] + ',' +
@@ -1042,7 +1089,7 @@ function loadPOIs(pois) {
                     if (index === pois.features.length)
                     {
                         poisWithDistances.forEach(function(poi){
-                            const id = poi.feature.properties.id;
+                            var id = poi.feature.properties.id;
                             // for each trip type there are 2-3 possible starts of the route
                             // need to choose the forward of these start locations to the user
                             switch (tripTypeParameter.tripType){
@@ -1159,9 +1206,4 @@ function inform(message) {
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------  OTHER  ---------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
-/*Check whether a point is within a polygon (assessment of the user location; if not within Vienna region,
-* advanced mode can't be applied since tracking and routing are not applicable*/
-function pointInBounds(pointX, pointY, bounds) {
-    //bounds = [[bottom left], [top right]]
-    return pointX >= bounds[0][0] && pointX <= bounds[1][0] && pointY >= bounds[0][1] && pointY <= bounds[1][1];
-}
+
