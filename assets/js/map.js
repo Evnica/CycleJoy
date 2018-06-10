@@ -14,7 +14,7 @@
 * supported. Writing to the file after user updates the list of locations will be supported in the version 0.13.
 *
 * Date: 10.06.2018
-* Version: 0.24
+* Version: 0.25
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * All the efforts were made to reference the code that inspired creation of this file. Some of the snippets address
@@ -1158,6 +1158,7 @@ function loadPOIs(pois) {
                                         'your reward =) Good luck!';
                                     $('#infoText').text(welcome);
                                     $('#info').removeClass('hidden');
+                                    $('#trip').text(tripTypeParameter.tripType + ' trip').removeClass('hidden');
                                     copyTargetCoordinatesToClipboard();
                                 }
                                 else{

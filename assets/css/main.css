@@ -2,7 +2,7 @@
 * A stylesheet for the BIKE Your BRAIN (aka CycleJoy) app.
 *
 * Date: 10.06.2018
-* Version: 0.10
+* Version: 0.11
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * The style is inspired by https://html5up.net/ and http://geojson.io/
@@ -852,5 +852,15 @@ inspired by http://geojson.io
         line-height: 1.15;
         padding: 8px 6px 6px 6px;
     }
+}
+
+#trip{
+    top: 0;
+    left: 45%;
+    z-index: 888;
+    position: fixed;
+    background-color: rgba(101, 107, 107, 0.80);
+    color: #f8ffff;
+    padding: 0 8px 0 8px;
 }
 
