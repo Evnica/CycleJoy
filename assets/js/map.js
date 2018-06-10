@@ -13,8 +13,8 @@
 * NB: Server interaction is implemented with the help of Java Servlets. At this point only reading of server files is
 * supported. Writing to the file after user updates the list of locations will be supported in the version 0.13.
 *
-* Date: 03.06.2018
-* Version: 0.20
+* Date: 10.06.2018
+* Version: 0.22
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * All the efforts were made to reference the code that inspired creation of this file. Some of the snippets address
