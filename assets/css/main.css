@@ -32,6 +32,10 @@ body {
     font-family: Helvetica, sans-serif;
 }
 
+.mapBody{
+    background-color: transparent;
+}
+
 ul {
     list-style: none;
 }

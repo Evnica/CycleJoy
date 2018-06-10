@@ -90,6 +90,9 @@ var url = new URL(window.location.href);
 var tripTypeParameter = {
     tripType: url.searchParams.get('tripType')
 };
+
+var popupsForEditor = [];
+var popups = [];
 // map styles
 var styles = ["mapbox://styles/mapbox/satellite-streets-v10", //satellite imagery with labels
                 "mapbox://styles/mapbox/dark-v9", // black background
@@ -133,9 +136,9 @@ var map = new mapboxgl.Map({
     container: "map",
     style: styles[currentStyleIndex],
     center: [16.35, 48.2],
-    zoom: 13,
+    zoom: 13
     // bounds are logical, but none of us is in Vienna, so they make no sense!
-    //maxBounds: bounds
+    //,maxBounds: bounds
 });
 
 var canvas = map.getCanvasContainer();
@@ -166,7 +169,7 @@ map.on('click', function (evt) {
             "name": "",
             "description": "",
             "lat": lngLat.lat,
-            "lon": lngLat.lng,
+            "lon": lngLat.lng
         };
 
         var newLocation = createLocationObjectFromProperties(props);
@@ -186,8 +189,8 @@ $( function() {
 //------------------------------------------------ MAP CONTROLS -------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
 // map style control to toggle backgrounds
-class MapStyleControl {
-    onAdd(map) {
+function MapStyleControl() {
+    MapStyleControl.prototype.onAdd = function(map){
         this._map = map;
         this._container = document.createElement('div');
         var button = document.createElement('button');
@@ -206,12 +209,12 @@ class MapStyleControl {
         //this._container.textContent = 'Background';
         this._container.appendChild(button);
         return this._container;
-    }
+    };
 
-    onRemove() {
+    MapStyleControl.prototype.onRemove = function() {
         this._container.parentNode.removeChild(this._container);
         this._map = undefined;
-    }
+    };
 }
 
 // toggle background style
@@ -255,8 +258,8 @@ var geolocateControl = new mapboxgl.GeolocateControl({
 /*
 * Control to toggle community locations (user generated points)
 * */
-class UserGeneratedMarkersControl {
-    onAdd(map) {
+function UserGeneratedMarkersControl() {
+    UserGeneratedMarkersControl.prototype.onAdd = function(map) {
         this._map = map;
         this._container = document.createElement('div');
         var button = document.createElement('button');
@@ -269,12 +272,12 @@ class UserGeneratedMarkersControl {
         this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
         this._container.appendChild(button);
         return this._container;
-    }
+    };
 
-    onRemove() {
+    UserGeneratedMarkersControl.prototype.onRemove = function() {
         this._container.parentNode.removeChild(this._container);
         this._map = undefined;
-    }
+    };
 }
 
 /*
@@ -302,8 +305,8 @@ function toggleCommunityLocations(){
 var communityLocationsControl = new UserGeneratedMarkersControl();
 map.addControl(communityLocationsControl, 'top-right');
 
-class EditingControl {
-    onAdd(map) {
+function EditingControl() {
+    EditingControl.prototype.onAdd = function(map) {
         this._map = map;
         this._container = document.createElement('div');
         var button = document.createElement('button');
@@ -316,16 +319,16 @@ class EditingControl {
         this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
         this._container.appendChild(button);
         return this._container;
-    }
+    };
 
-    onRemove() {
+    EditingControl.prototype.onRemove = function() {
         this._container.parentNode.removeChild(this._container);
         this._map = undefined;
-    }
+    };
 }
 
-class PointDrawControl {
-    onAdd(map) {
+function PointDrawControl() {
+    PointDrawControl.prototype.onAdd = function(map) {
         this._map = map;
         this._container = document.createElement('div');
         var button = document.createElement('button');
@@ -339,9 +342,9 @@ class PointDrawControl {
         this._container.className = 'mapboxgl-ctrl mapboxgl-ctrl-group';
         this._container.appendChild(button);
         return this._container;
-    }
+    };
 
-    onRemove() {
+    PointDrawControl.prototype.onRemove = function() {
         this._container.parentNode.removeChild(this._container);
         this._map = undefined;
     }
@@ -360,6 +363,9 @@ function toggleEditor() {
         map.removeControl(draw);
         $('#editor').removeClass('displayed').prop('title', 'Enter editor mode');
         setGrab();
+        userMarkers.forEach(function (marker) {
+            marker.setPopup(popups[marker._element.id.split('-')[1]]);
+        });
     }
     else {
         map.addControl(draw, 'top-right');
@@ -367,6 +373,9 @@ function toggleEditor() {
         if (!communityLocationsDisplayed) {
             $('#communityLocations').trigger('click');
         }
+        userMarkers.forEach(function (marker) {
+            marker.setPopup(popupsForEditor[marker._element.id.split('-')[1]]);
+        });
     }
     editor = !editor;
 }
@@ -388,7 +397,7 @@ var geolocationError = function(error){
                 message - Details about the error in human-readable format
             }
     */
-    console.warn(`ERROR(${error.code}): ${error.message}`);
+    console.warn('ERROR ' + error.code +': ' + error.message);
     inform("Your location could not be obtained. The app has switched to the basic functionality.");
     mode = 'basic';
 
@@ -522,11 +531,18 @@ function createPoiPopup(feature){
 function createCommunityLocationPopup(feature){
 
     var customProps = '';
+    var customPropsForEditor = '';
     var props = Object.getOwnPropertyNames(feature.properties);
     for (var i = 0; i < props.length; i++){
         if (props[i] !== 'name' && props[i] !== 'description' && props[i] !== 'lat'
                                                               && props[i] !== 'lon' && props[i] !== 'id'){
             customProps +=
+                '<tr >' +
+                '   <th><input type="text" readonly value="' + props[i] + '"/></th>' +
+                '   <td><input type="text" readonly value="' + feature.properties[props[i]] + '"/></td>' +
+                '</tr>';
+
+            customPropsForEditor +=
                 '<tr >' +
                 '   <th><input type="text" value="' + props[i] + '"/></th>' +
                 '   <td><input type="text" value="' + feature.properties[props[i]] + '"/></td>' +
@@ -537,37 +553,72 @@ function createCommunityLocationPopup(feature){
     var popupStructure =
         '    <div class="popupContent active">\n' +
         '    <div id="commLoc_{id}" class="active">' +
-        '    <table id="tblCommLoc_{id}" class="commLocPopupTbl">' +
+            '    <table id="tblCommLoc_{id}" class="commLocPopupTbl">' +
+            '        <tbody>' +
+            '           <tr >' +
+            '              <th>name</th><td><input type="text" readonly value="' + feature.properties.name + '"/></td>'+
+            '           </tr>' +
+            '           <tr >' +
+            '              <th>description</th><td><input type="text" readonly value="'
+                                                        + feature.properties.description + '"/></td>' +
+            '           </tr>' +
+            '           <tr >' +
+            '              <th>lat</th><td><input type="text" readonly value="'
+                                                        + feature.geometry.coordinates[1] + '"/></td>' +
+            '           </tr>' +
+            '           <tr >' +
+            '              <th>lon</th><td><input type="text" readonly value="'
+                                                        + feature.geometry.coordinates[0] + '"/></td>' +
+            '           </tr>' +
+                        customProps +
+            '        </tbody>'+
+            '    </table>' +
+        '    </div>\n' +
+        '    </div>';
+
+    var popupStructureForEditor =
+        '    <div class="popupContent active">\n' +
+        '    <div id="commLocEdit_{id}" class="active">' +
+        '    <table id="tblCommLocEdit_{id}" class="commLocPopupTbl">' +
         '        <tbody>' +
         '           <tr >' +
-        '              <th>name</th><td><input type="text" value="' + feature.properties.name + '"/></td>' +
+        '              <th>name</th><td><input type="text" value="' + feature.properties.name + '"/></td>'+
         '           </tr>' +
         '           <tr >' +
         '              <th>description</th><td><input type="text" value="'
-                                                    + feature.properties.description + '"/></td>' +
+                                                + feature.properties.description + '"/></td>' +
         '           </tr>' +
         '           <tr >' +
         '              <th>lat</th><td><input type="text" readonly value="'
-                                                    + feature.geometry.coordinates[1] + '"/></td>' +
+                                                + feature.geometry.coordinates[1] + '"/></td>' +
         '           </tr>' +
         '           <tr >' +
         '              <th>lon</th><td><input type="text" readonly value="'
-                                                    + feature.geometry.coordinates[0] + '"/></td>' +
+                                                + feature.geometry.coordinates[0] + '"/></td>' +
         '           </tr>' +
-                    customProps +
+                    customPropsForEditor +
         '        </tbody>'+
         '    </table>' +
-        '    <div id="addRowBtn_{id}" class="addRowBtn fa fa-plus-square" onclick="addRow(this)">Add row</div>\n' +
+        '    <div id="addRowBtn_{id}" class="addRowBtn fa fa-plus-square" onclick="addRow(this)">' +
+        'Add row' +
+        '    </div>\n' +
         '    </div>\n' +
         '    <div class="ppBtnDiv">\n' +
         '        <div id="ppBtn_{id}" class="ppBtn active" onclick="save(this)">Save</div>\n' +
         '    </div>' +
         '    </div>';
 
-    var popup = new mapboxgl.Popup( { offset : 8 } );
     var re = new RegExp('{id}', 'g');
+
+    var popup = new mapboxgl.Popup( {offset: 8} );
     popupStructure = popupStructure.replace(re, feature.properties.id);
     popup.setHTML(popupStructure);
+    popups[feature.properties.id.split('-')[1]] = popup;
+
+    var popupForEditor = new mapboxgl.Popup( { offset : 8 } );
+    popupStructureForEditor = popupStructureForEditor.replace(re, feature.properties.id);
+    popupForEditor.setHTML(popupStructureForEditor);
+    popupsForEditor[feature.properties.id.split('-')[1]] = popupForEditor;
 
     return popup;
 }
@@ -620,7 +671,7 @@ function ppNext(element) {
                 setQuizContainer(distance, quizQuestion, quizAnswer)
 
             }, function (error) {
-                console.warn(`ERROR(${error.code}): ${error.message}`);
+                console.warn('ERROR ' + error.code + ': ' + error.message);
                 inform("An error occurred. Have you considered a job of a software tester? " +
                     "You will be very successful in this position!");
             }, geoSettings);
@@ -678,7 +729,7 @@ function submit(element){
                 // check whether there are still locations to be forwarded to available
                 if (visitedPOIsCount < currentPOIs.features.length -1) {
                     $('#quizQ').html('Great job! You are attentive and your answer is correct!<br> Your next target awaits!');
-                    $('#quizBtn').text("FORWARD!");
+                    $('#quizBtn').text("GO!");
                 }
                 else { // all locations are visited
                     $('#quizQ').html('Brilliant answer! You have reached the end of this journey. Congratulations!');
@@ -703,7 +754,7 @@ function submit(element){
                         .html("Wrong. But don't worry. You will do better next time. Let's get to the next location and try there!");
                     forward = !forward;
                 }
-                $('#quizBtn').text("FORWARD!");
+                $('#quizBtn').text("GO!");
             }
             // nothing more to see
             else{
@@ -717,7 +768,7 @@ function submit(element){
             }
             triesCount = 0;
         }
-    } else if (btnTxt === 'FORWARD!'){
+    } else if (btnTxt === 'GO!'){
 
         $('#quizContainer').addClass('hidden');
         navigateToTheNext();
@@ -872,7 +923,7 @@ function navigateToTheNext(){
 /*Add a row to the user generated location popup for custom key-value pairs*/
 function addRow(btn){
     var id = $(btn).prop('id').split('_')[1];
-    $('#tblCommLoc_' + id + ' tr:last')
+    $('#tblCommLocEdit_' + id + ' tr:last')
         .after('<tr ><th><input type="text" value=""/></th><td><input type="text" value=""/></td></tr>' );
 }
 
@@ -881,7 +932,7 @@ function save(btn){
     var key, value;
     var id = $(btn).prop('id').split('_')[1];
     var locationObjectProperties = {"id" : id};
-    $('#tblCommLoc_' + id).find('tr').each(function (i, tr) {
+    $('#tblCommLocEdit_' + id).find('tr').each(function (i, tr) {
         if (i < 4){
             key = $(tr).children().get(0).innerText;
         }
@@ -912,7 +963,9 @@ function save(btn){
             userAddedLocations.features.push( savedLocation );
         }
 
-        console.log(JSON.stringify(userAddedLocations));
+        createCommunityLocationPopup(savedLocation);
+
+        if(debug) {console.log(JSON.stringify(userAddedLocations));}
         $('.mapboxgl-popup').each(function () {
             $(this).remove();
         });
@@ -936,9 +989,6 @@ function save(btn){
                 alert(response.status);
             }
         });*/
-
-
-
     }
     else{
         inform('Name and description must be provided before saving a location');
