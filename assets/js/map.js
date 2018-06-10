@@ -13,8 +13,8 @@
 * NB: Server interaction is implemented with the help of Java Servlets. At this point only reading of server files is
 * supported. Writing to the file after user updates the list of locations will be supported in the version 0.13.
 *
-* Date: 03.06.2018
-* Version: 0.20
+* Date: 10.06.2018
+* Version: 0.25
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * All the efforts were made to reference the code that inspired creation of this file. Some of the snippets address
@@ -482,6 +482,16 @@ function getLocationIfAvailable(state){
     }
 }
 
+function copyTargetCoordinatesToClipboard(){
+    var coords = currentTarget.geometry.coordinates[0] + ', ' + currentTarget.geometry.coordinates[1];
+    navigator.clipboard.writeText(coords).then(function() {
+        console.log('Async: Copying to clipboard was successful!');
+        inform('Target coordinates ['+ coords + '] were copied to the clipboard');
+    }, function(err) {
+        console.error('Async: Could not copy text: ', err);
+    });
+}
+
 //---------------------------------------------------------------------------------------------------------------------
 //-----------------------------------  CREATION of MARKERS and POP-UPs ------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
@@ -636,6 +646,7 @@ function ppNext(element) {
     }
 
     if (btnTxt === 'NEXT'){
+        $('#ppCrdBtn_' + id).addClass('hidden');
         $("#ppDesc_" + id).removeClass('active').addClass('hidden');
         $("#ppOpnHrs_" + id).addClass('active');
         $("#ppAdmFee_" + id).addClass('active');
@@ -773,6 +784,7 @@ function submit(element){
         $('#quizContainer').addClass('hidden');
         navigateToTheNext();
 
+
     } else{
 
         $('#quizContainer').addClass('hidden');
@@ -808,10 +820,10 @@ function navigateToTheNext(){
                     inform('Sorry, no navigation without choosing a trip type.');
             }
         }
-
+        var i;
         if (forward){
             console.log('off we go!');
-            for (var i = 0; i < chosenRoute.visited.length; i++){
+            for (i = 0; i < chosenRoute.visited.length; i++){
                 if (!chosenRoute.visited[i]){
                     targetId = chosenRoute.route[i];
                     chosenRoute.visited[i] = true;
@@ -821,7 +833,7 @@ function navigateToTheNext(){
         }
         else {
             console.log('off we go, but with some loops');
-            for (var i = chosenRoute.visited.length - 1; i > -1; i--){
+            for (i = chosenRoute.visited.length - 1; i > -1; i--){
                 if (!chosenRoute.visited[i]){
                     targetId = chosenRoute.route[i];
                     chosenRoute.visited[i] = true;
@@ -836,14 +848,14 @@ function navigateToTheNext(){
 
             var startCoords = currentTarget.geometry.coordinates;
 
-            for (var i = 0; i < currentPOIs.features.length; i++){
+            for (i = 0; i < currentPOIs.features.length; i++){
                 if(currentPOIs.features[i].properties.id === targetId){
                     currentTarget = currentPOIs.features[i];
                     break;
                 }
             }
 
-            for (var i = 0; i < tripRelatedMarkers.length; i++){
+            for (i = 0; i < tripRelatedMarkers.length; i++){
                 var unit = tripRelatedMarkers[i];
                 if(!unit.addedToMap){
                     if(unit.marker._element.id.split('_')[1]*1 === targetId){
@@ -898,7 +910,9 @@ function navigateToTheNext(){
                 };
                 routeLayers.push(layer);
                 map.addLayer(layer);
-                map.jumpTo({ 'center': startCoords, 'zoom': 14 });
+                var center = [(startCoords[0] + currentTarget.geometry.coordinates[0])/2,
+                                (startCoords[1] + currentTarget.geometry.coordinates[1])/2];
+                map.jumpTo({ 'center': center, 'zoom': 14 });
                 var i = 0;
                 var timer = window.setInterval(function() {
                     if (i < coordinates.length) {
@@ -909,15 +923,17 @@ function navigateToTheNext(){
                     } else {
                         window.clearInterval(timer);
                     }
-                }, 100);
+                }, 50);
 
 
             });
+            copyTargetCoordinatesToClipboard();
         } else {
-            alert('Something went wrong. ' +
+            inform('Something went wrong. ' +
                 'Please buy the developers some Red Bull so they could be more productive in the night!')
         }
     }
+
 }
 
 /*Add a row to the user generated location popup for custom key-value pairs*/
@@ -1066,7 +1082,6 @@ function loadPOIs(pois) {
         if(mode === 'advanced'){
             var index = 0;
             var min = Infinity;
-            var indexOfMin;
             var poisWithDistances = [];
             var from = [userLocation.coords.longitude, userLocation.coords.latitude];
             var to;
@@ -1128,7 +1143,29 @@ function loadPOIs(pois) {
                         poisWithDistances.forEach(function(poi){
                             if (poi.distance === min) {
                                 createMarkerAndAdd(poi.feature, true, 'tripRelated', '');
+                                map.jumpTo({'center': poi.feature.geometry.coordinates, 'zoom': 14});
                                 currentTarget = poi.feature;
+
+                                if(tripTypeParameter.tripType !== '' || tripTypeParameter.tripType === null){
+
+                                    var welcome = 'Hi there! Welcome to the ' + tripTypeParameter.tripType + ' trip! ' +
+                                        'Your first destination is on the map. Now navigate to it and read its ' +
+                                        'description. Be sure to read carefully! Press "TO QUIZ" to answer a question '+
+                                        'based on what you have read. If you answer correctly, the next closest ' +
+                                        'destination will appear on the map. If you give a wrong answer twice, the ' +
+                                        'next destination may not be the closest one. Navigate to it to continue your '+
+                                        'journey. Continue until you arrive to the last, 5th destination, and claim ' +
+                                        'your reward =) Good luck!';
+                                    $('#infoText').text(welcome);
+                                    $('#info').removeClass('hidden');
+                                    $('#trip').text(tripTypeParameter.tripType + ' trip').removeClass('hidden');
+                                    copyTargetCoordinatesToClipboard();
+                                }
+                                else{
+                                    window.location.href = 'index.html';
+                                }
+
+
                             }
                             else{
                                 createMarkerAndAdd(poi.feature, false, 'tripRelated', '');
@@ -1200,7 +1237,16 @@ function requestPOIifTypeChosen() {
 /*Inform user or prompt simple actions*/
 function inform(message) {
     //TODO: style the information dialog; 2 separate versions: 1 for quiz, 1 for information only
-    alert(message)
+    $('#notifyText').text(message);
+    $('#notify').removeClass('hidden');
+}
+
+function infoClose(){
+    $('#info').addClass('hidden');
+}
+
+function notifyClose(){
+    $('#notify').addClass('hidden');
 }
 
 //---------------------------------------------------------------------------------------------------------------------

@@ -1,8 +1,8 @@
 /*
 * A stylesheet for the BIKE Your BRAIN (aka CycleJoy) app.
 *
-* Date: 03.06.2018
-* Version: 0.8
+* Date: 10.06.2018
+* Version: 0.11
 * Authors: D. Strelnikova (d.strelnikova@fh-kaernten.at), J. Stratmann (Judith.Stratmann@edu.fh-kaernten.ac.at )
 *
 * The style is inspired by https://html5up.net/ and http://geojson.io/
@@ -609,6 +609,8 @@ inspired by http://geojson.io
     margin-bottom: 10px;
 }
 
+/* Congratulations to the winner */
+
 #congrats{
     z-index: 999999;
     top: 50%;
@@ -618,7 +620,7 @@ inspired by http://geojson.io
     margin-top: -10em;
     margin-left: -14em;
     padding: 10px;
-    background-color: #162e69;
+    background-color: #858585;
     color: #f8ffff;
     border-radius: 5px;
     position:fixed;
@@ -646,7 +648,7 @@ inspired by http://geojson.io
         #congrats {
             width:16em;
             height: 14em;
-            margin-top: -7em;
+            margin-top: -10em;
             margin-left: -9em;
         }
     }
@@ -657,13 +659,13 @@ inspired by http://geojson.io
         }
     }
 
-#congratsBtn{
+#congratsBtn, #infoBtn{
     width: 30%;
     margin: auto;
     display: block;
     position: relative;
     padding: 3px;
-    background-color: #100634;
+    background-color: #515151;
     border: #d6dee5;
     border-radius: 5px;
     cursor: pointer;
@@ -681,8 +683,6 @@ inspired by http://geojson.io
         #firework {
             width:24em;
             height: 12em;
-            margin-top: -9em;
-            margin-left: -13em;
         }
     }
 
@@ -690,8 +690,6 @@ inspired by http://geojson.io
         #firework {
             width:20em;
             height: 10em;
-            margin-top: -8em;
-            margin-left: -11em;
         }
     }
 
@@ -699,8 +697,6 @@ inspired by http://geojson.io
         #firework {
             width:16em;
             height: 8em;
-            margin-top: -7em;
-            margin-left: -9em;
         }
     }
 
@@ -714,3 +710,157 @@ inspired by http://geojson.io
     text-align: center;
     margin-bottom: 8px;
 }
+
+/* Initial info message */
+
+#info{
+    z-index: 999;
+    top: 50%;
+    left: 50%;
+    width: 32em;
+    height:18em;
+    margin-top: -10em;
+    margin-left: -16.5em;
+    padding: 20px 12px 12px 12px;
+    background-color: #858585;
+    color: #f8ffff;
+    border-radius: 5px;
+    position:fixed;
+
+}
+    @media screen and (max-width: 800px){
+        #info {
+            height: 16em;
+            margin-top: -8em;
+        }
+    }
+
+    @media screen and (max-width: 600px){
+        #info {
+            width:28em;
+            margin-left: -14.5em;
+            height:18em;
+            margin-top: -10em;
+        }
+    }
+
+    @media screen and (max-width: 500px){
+        #info {
+            width:24em;
+            margin-left: -12.5em;
+            height:21em;
+            margin-top: -11em;
+        }
+    }
+
+    @media screen and (max-width: 425px){
+        #info {
+            width:20em;
+            margin-left: -11em;
+            height:25em;
+            margin-top: -12.5em;
+        }
+    }
+
+    @media screen and (max-width: 360px){
+        #info {
+            width:18em;
+            margin-left: -9.5em;
+            height:21em;
+            margin-top: -11em;
+            font-size: 13px;
+            line-height: 1.15;
+        }
+    }
+
+    @media screen and (max-width: 270px){
+        #info {
+            width:16em;
+            margin-left: -8.5em;
+            font-size: 12px;
+            line-height: 1.15;
+            height:24em;
+            margin-top: -12.5em;
+            padding: 8px 6px 6px 6px;
+        }
+        .ppBtnDiv{
+            margin-top: 5px;
+        }
+    }
+
+#infoText, #notifyText{
+    background-color: #f8ffff;
+    color: #424747;
+    text-align: center;
+    padding: 7px;
+    margin-bottom: 8px;
+}
+
+/* Inform() function notification container */
+
+#notify{
+    z-index: 888;
+    top: 50%;
+    left: 50%;
+    width: 32em;
+    height:auto;
+    margin-top: auto;
+    margin-left: -16.5em;
+    padding: 20px 12px 12px 12px;
+    background-color: #858585;
+    color: #f8ffff;
+    border-radius: 5px;
+    position:fixed;
+
+}
+
+@media screen and (max-width: 600px){
+    #notify {
+        width:28em;
+        margin-left: -14.5em;
+    }
+}
+
+@media screen and (max-width: 500px){
+    #notify {
+        width:24em;
+        margin-left: -12.5em;
+    }
+}
+
+@media screen and (max-width: 425px){
+    #notify {
+        width:20em;
+        margin-left: -11em;
+    }
+}
+
+@media screen and (max-width: 360px){
+    #notify {
+        width:18em;
+        margin-left: -9.5em;
+        font-size: 13px;
+        line-height: 1.15;
+    }
+}
+
+@media screen and (max-width: 270px){
+    #notify {
+        width:16em;
+        margin-left: -8.5em;
+        font-size: 12px;
+        line-height: 1.15;
+        padding: 8px 6px 6px 6px;
+    }
+}
+
+#trip{
+    top: 0;
+    left: 45%;
+    z-index: 888;
+    position: fixed;
+    background-color: rgba(101, 107, 107, 0.80);
+    color: #f8ffff;
+    padding: 0 8px 0 8px;
+}
+
